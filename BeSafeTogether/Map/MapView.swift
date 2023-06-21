@@ -10,7 +10,7 @@ import SwiftUI
 struct MapView: View {
     var body: some View {
         VStack {
-            Text("Welcome")
+            Text("Welcome home my brother")
         }
     }
 }

@@ -19,8 +19,6 @@ struct ProfileView: View {
 
 struct ProfileInfoView: View {
     
-    let h3 = UIFont.systemFont(ofSize: 18, weight: .semibold, width: .standard)
-    
     var body: some View {
         ZStack {
             Rectangle()
@@ -38,12 +36,11 @@ struct ProfileInfoView: View {
                 }
                 
                 Text("Username")
-                    .font(Font(h3))
+                    .font(Font(UIFont.semibold_18))
                     .foregroundColor(Color.white)
 
             }
         }
-        
     }
 }
 
