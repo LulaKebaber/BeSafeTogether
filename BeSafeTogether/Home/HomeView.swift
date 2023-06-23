@@ -15,7 +15,7 @@ struct HomeView: View {
         VStack {
             Text("Welcome Home!")
                 .font(Font(UIFont.bold_32))
-                .padding(.top, 10)
+                .padding(.top, 30)
             
             MicButton()
                 .padding(.top, 60)
@@ -53,7 +53,7 @@ struct RequirementsList: View {
     var body: some View {
         ZStack {
             Rectangle()
-                .fill(Color("purple 100"))
+                .fill(Color.black)
                 .frame(width: 360.0, height: 220)
                 .cornerRadius(25)
                 .padding(10)
@@ -77,13 +77,13 @@ struct OptionVIew: View {
     var body: some View {
         HStack {
             RoundedRectangle(cornerRadius: 4)
-                        .foregroundColor(Color("purple 100"))
-                        .frame(width: 23, height: 23)
-                        .overlay(
-                            RoundedRectangle(cornerRadius: 3)
-                                .stroke(Color.white, lineWidth: 2.5)
-                        )
-                        .padding(.leading, 50)
+                .foregroundColor(Color.black)
+                .frame(width: 23, height: 23)
+                .overlay(
+                    RoundedRectangle(cornerRadius: 3)
+                        .stroke(Color.white, lineWidth: 2.5)
+                    )
+                    .padding(.leading, 50)
             Text(text)
                 .foregroundColor(Color.white)
                 .font(Font(UIFont.medium_18))

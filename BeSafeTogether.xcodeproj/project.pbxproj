@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		25E684C62A435111001E6571 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E684C52A435111001E6571 /* Helper.swift */; };
 		25E684C82A4352F7001E6571 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E684C72A4352F7001E6571 /* HomeViewModel.swift */; };
+		25E684D02A45CFB2001E6571 /* SwiftUIView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E684CF2A45CFB2001E6571 /* SwiftUIView.swift */; };
 		25FF34DA2A42BAC100398411 /* BeSafeTogetherApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34D92A42BAC100398411 /* BeSafeTogetherApp.swift */; };
 		25FF34DC2A42BAC100398411 /* TabBar.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34DB2A42BAC100398411 /* TabBar.swift */; };
 		25FF34DE2A42BAC200398411 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 25FF34DD2A42BAC200398411 /* Assets.xcassets */; };
@@ -21,6 +22,7 @@
 /* Begin PBXFileReference section */
 		25E684C52A435111001E6571 /* Helper.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Helper.swift; sourceTree = "<group>"; };
 		25E684C72A4352F7001E6571 /* HomeViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeViewModel.swift; sourceTree = "<group>"; };
+		25E684CF2A45CFB2001E6571 /* SwiftUIView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftUIView.swift; sourceTree = "<group>"; };
 		25FF34D62A42BAC100398411 /* BeSafeTogether.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BeSafeTogether.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		25FF34D92A42BAC100398411 /* BeSafeTogetherApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = BeSafeTogetherApp.swift; sourceTree = "<group>"; };
 		25FF34DB2A42BAC100398411 /* TabBar.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBar.swift; sourceTree = "<group>"; };
@@ -62,9 +64,18 @@
 		25E684CD2A436600001E6571 /* Profile */ = {
 			isa = PBXGroup;
 			children = (
+				25E684CE2A45CFA5001E6571 /* Contacts */,
 				25FF34EF2A43227400398411 /* ProfileView.swift */,
 			);
 			path = Profile;
+			sourceTree = "<group>";
+		};
+		25E684CE2A45CFA5001E6571 /* Contacts */ = {
+			isa = PBXGroup;
+			children = (
+				25E684CF2A45CFB2001E6571 /* SwiftUIView.swift */,
+			);
+			path = Contacts;
 			sourceTree = "<group>";
 		};
 		25FF34CD2A42BAC100398411 = {
@@ -178,6 +189,7 @@
 			files = (
 				25FF34DC2A42BAC100398411 /* TabBar.swift in Sources */,
 				25FF34EE2A43226100398411 /* HomeView.swift in Sources */,
+				25E684D02A45CFB2001E6571 /* SwiftUIView.swift in Sources */,
 				25E684C82A4352F7001E6571 /* HomeViewModel.swift in Sources */,
 				25FF34F02A43227400398411 /* ProfileView.swift in Sources */,
 				25FF34EC2A43217B00398411 /* MapView.swift in Sources */,

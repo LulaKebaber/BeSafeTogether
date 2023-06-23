@@ -12,7 +12,7 @@ struct ContentView: View {
         TabView {
             MapView()
                 .tabItem {
-                    Label("Main", systemImage: "map")
+                    Label("Map", systemImage: "map")
                 }
             HomeView()
                 .tabItem {
