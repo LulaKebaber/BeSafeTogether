@@ -9,12 +9,19 @@ import SwiftUI
 
 struct ProfileView: View {
     var body: some View {
-        VStack {
-            ProfileInfoView()
-            StopWordsView()
-            ContactsButtonView()
-                .padding()
-            Spacer()
+        NavigationView {
+            VStack {
+                ProfileInfoView()
+                StopWordsView()
+                
+                ContactsButtonView()
+//                NavigationLink {
+//                    ContactsView()
+//                } label: {
+//                    ContactsButtonView()
+//                }
+                Spacer()
+            }
         }
     }
 }
@@ -113,7 +120,7 @@ struct AddWordView: View {
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
                         .foregroundColor(Color.black)
-                        .frame(width: 100, height: 33)
+                        .frame(width: 80, height: 33)
                     Text("Add")
                         .foregroundColor(Color.white)
                 }
@@ -126,13 +133,15 @@ struct AddWordView: View {
 struct ContactsButtonView: View {
     var body: some View {
         Button(action: {}) {
-            ZStack {
-                RoundedRectangle(cornerRadius: 10)
-                    .foregroundColor(Color.black)
-                    .frame(width: 360, height: 80)
-                Text("My Contacts")
-                    .foregroundColor(Color.white)
-                    .font(Font(UIFont.medium_26))
+            NavigationLink(destination: ContactsView()) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 10)
+                        .foregroundColor(Color.black)
+                        .frame(width: 360, height: 80)
+                    Text("My Contacts")
+                        .foregroundColor(Color.white)
+                        .font(Font(UIFont.medium_26))
+                }
             }
         }
     }
