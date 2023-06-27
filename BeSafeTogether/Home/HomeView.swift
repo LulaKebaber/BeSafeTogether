@@ -63,15 +63,15 @@ struct RequirementsList: View {
                     .font(Font(UIFont.regular_26))
                     .padding(.bottom, 10)
                 
-                OptionVIew(text: "Gps is enabled")
-                OptionVIew(text: "Contacts are set")
-                OptionVIew(text: "Stop words are set")
+                OptionView(text: "Gps is enabled")
+                OptionView(text: "Contacts are set")
+                OptionView(text: "Stop words are set")
             }
         }
     }
 }
 
-struct OptionVIew: View {
+struct OptionView: View {
     var text: String
     
     var body: some View {

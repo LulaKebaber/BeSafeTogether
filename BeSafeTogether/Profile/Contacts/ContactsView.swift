@@ -72,9 +72,9 @@ struct ContactView: View {
             
             Button(action: {}) {
                 ZStack {
-                    RoundedRectangle(cornerRadius: 5)
+                    RoundedRectangle(cornerRadius: 13)
                         .foregroundColor(Color.black)
-                        .frame(width: 60, height: 33)
+                        .frame(width: 65, height: 35)
                     Text("Edit")
                         .foregroundColor(Color.white)
                         .font(Font(UIFont.regular_14))
@@ -102,16 +102,16 @@ struct MessageView: View {
                 .padding()
             Spacer()
         }
-        .background(RoundedRectangle(cornerRadius: 4)
+        .background(RoundedRectangle(cornerRadius: 15)
                         .foregroundColor(Color.white)
                         .frame(width: 330, height: 100)
-                        .overlay(RoundedRectangle(cornerRadius: 6)
-                            .stroke(Color.black, lineWidth: 2.5)))
+                        .overlay(RoundedRectangle(cornerRadius: 15)
+                            .stroke(Color.black, lineWidth: 2)))
         .frame(width: 330, height: 100)
         
         Button(action: {}) {
             ZStack {
-                RoundedRectangle(cornerRadius: 5)
+                RoundedRectangle(cornerRadius: 15)
                     .foregroundColor(Color.black)
                     .frame(width: 335, height: 45)
                 Text("Save")
