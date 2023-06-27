@@ -1,60 +1,106 @@
-//
-//  MapView.swift
-//  BeSafeTogether
-//
-//  Created by Danial Baizak on 21.06.2023.
-//
+//создал хуесос
 
 import SwiftUI
 import MapKit
 import CoreLocation
 
 struct MapView: View {
+    
     @StateObject private var locationManager = LocationManager()
-
+    @State private var region = MKCoordinateRegion(center: CLLocationCoordinate2D(latitude: 42.882004, longitude: -122.03118), span: MKCoordinateSpan(latitudeDelta: 0.2, longitudeDelta: 0.2))
+    @State private var userTrackingMode: MapUserTrackingMode = .follow
+    
     var body: some View {
-        MapViewModel(locationManager: locationManager)
-    }
-}
-
-struct MapViewModel: UIViewRepresentable {
-    @ObservedObject var locationManager: LocationManager
-
-    func makeUIView(context: Context) -> MKMapView {
-        MKMapView(frame: .zero)
-    }
-
-    func updateUIView(_ view: MKMapView, context: Context) {
-            if let userLocation = locationManager.locationManager.location?.coordinate {
-                let region = MKCoordinateRegion(center: userLocation, latitudinalMeters: 1000, longitudinalMeters: 1000)
-                view.setRegion(region, animated: true)
+        VStack {
+            Map(coordinateRegion: $region, showsUserLocation: true)
+                .edgesIgnoringSafeArea(.all)
+            
+            Button(action: {
+                getCurrentLocation { coordinates in
+                    if let coordinates = coordinates {
+                        // Используйте координаты местоположения здесь
+                        print("Latitude: \(coordinates.latitude), Longitude: \(coordinates.longitude)")
+                    } else {
+                        // Обработка ошибки или случая, когда местоположение недоступно
+                        print("Не удалось получить местоположение")
+                    }
+                }
+                
+//                if let location = locationManager.lastKnownLocation {
+//                    region = MKCoordinateRegion(center: location, span: region.span)
+//                }
+            }) {
+                Text("Центрировать на моем местоположении")
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(10)
             }
+            .padding()
         }
+        .onAppear {
+            locationManager.requestLocation()
+        }
+    }
+    
+    func getCurrentLocation(completion: @escaping (CLLocationCoordinate2D?) -> Void) {
+        let locationManager = CLLocationManager()
+        
+        locationManager.requestAlwaysAuthorization()
+        
+        // Проверка доступности служб геолокации
+        if CLLocationManager.locationServicesEnabled() {
+            locationManager.requestWhenInUseAuthorization()
+            
+            // Обработка успешного разрешения
+            if CLLocationManager.authorizationStatus() == .authorizedWhenInUse {
+                locationManager.desiredAccuracy = kCLLocationAccuracyBest
+                locationManager.startUpdatingLocation()
+                
+                // Получение текущего местоположения
+                if let location = locationManager.location {
+                    let currentLocation = location.coordinate
+                    completion(currentLocation)
+                } else {
+                    completion(nil)
+                }
+            } else {
+                // Разрешение на использование геолокации не предоставлено
+                completion(nil)
+            }
+        } else {
+            // Службы геолокации недоступны
+            completion(nil)
+        }
+    }
+
 }
 
-class LocationManager: NSObject, CLLocationManagerDelegate, ObservableObject {
+class LocationManager: NSObject, ObservableObject, CLLocationManagerDelegate {
     private let locationManager = CLLocationManager()
-
+    
+    @Published var lastKnownLocation: CLLocationCoordinate2D?
+    
     override init() {
         super.init()
         locationManager.delegate = self
-        locationManager.desiredAccuracy = kCLLocationAccuracyBest
+    }
+    
+    func requestLocation() {
         locationManager.requestWhenInUseAuthorization()
-        locationManager.startUpdatingLocation()
+        locationManager.requestLocation()
     }
-
-    // CLLocationManagerDelegate methods
+    
     func locationManager(_ manager: CLLocationManager, didUpdateLocations locations: [CLLocation]) {
-        guard let location = locations.last else { return }
-        // Access the updated user location here
-        // You can update a @Published property in your view model with the location data
+        if let location = locations.last {
+            lastKnownLocation = location.coordinate
+        }
     }
-
+    
     func locationManager(_ manager: CLLocationManager, didFailWithError error: Error) {
-        // Handle location update errors here
+        
     }
 }
-
 
 struct MapView_Previews: PreviewProvider {
     static var previews: some View {
