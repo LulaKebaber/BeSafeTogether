@@ -9,7 +9,7 @@ import SwiftUI
 import Moya
 
 struct RegistrationView: View {
-    @State private var username = "name"
+    @State private var username = "name111"
     @State private var password = "pass"
     
     var body: some View {
