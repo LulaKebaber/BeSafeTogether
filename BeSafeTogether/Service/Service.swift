@@ -10,21 +10,32 @@ import Foundation
 
 enum Service {
     case registerNewUser(username: String, password: String)
+    case loginUser(username: String, password: String)
 }
 
 extension Service: TargetType {
     var baseURL: URL {
-//        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
-        URL(string: "http://localhost:8000")! // на локалку
+        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
+//        URL(string: "http://localhost:8000")! // на локалку
 
     }
     
     var path: String {
-        "/auth/users"
+        switch self {
+        case .registerNewUser(_, _):
+            return "/auth/users"
+        case .loginUser(_, _):
+            return "/auth/users/tokens"
+        }
     }
     
     var method: Moya.Method {
-        .post
+        switch self {
+        case .registerNewUser(_, _):
+            return .post
+        case .loginUser(_, _):
+            return .post
+        }
     }
     
     var task: Moya.Task {
@@ -35,10 +46,34 @@ extension Service: TargetType {
                 "password": password
             ]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+            
+        case let .loginUser(username, password):
+            let parameters: [String: Any] = [
+                "grant_type": "",
+                "username": username,
+                "password": password,
+                "scope": "",
+                "client_id": "",
+                "client_secret": ""
+            ]
+            return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
         }
     }
     
     var headers: [String : String]? {
-        ["Content-Type": "application/json"]
+        
+        switch self {
+        case .registerNewUser(_, _):
+            return [
+                "Content-Type": "application/json"
+            ]
+        case .loginUser(_, _):
+            return [
+                "accept": "application/json",
+                "Content-Type": "application/x-www-form-urlencoded"
+            ]
+        }
+//        ["accept: application/json": "application/json"]
+        
     }
 }

@@ -13,13 +13,7 @@ struct ProfileView: View {
             VStack {
                 ProfileInfoView()
                 StopWordsView()
-                
                 ContactsButtonView()
-//                NavigationLink {
-//                    ContactsView()
-//                } label: {
-//                    ContactsButtonView()
-//                }
                 Spacer()
             }
         }

@@ -9,4 +9,9 @@ import Foundation
 
 struct UserInfo: Decodable {
     let email: String
-}
+} // registration
+
+struct UserToken: Decodable {
+    let access_token: String
+    let token_type: String
+} // login

@@ -11,7 +11,7 @@ import SwiftUI
 struct BeSafeTogetherApp: App {
     var body: some Scene {
         WindowGroup {
-            RegistrationView()
+            ContentView()
         }
     }
 }

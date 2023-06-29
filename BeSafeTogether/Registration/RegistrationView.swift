@@ -13,23 +13,41 @@ struct RegistrationView: View {
     @State private var password = "pass"
     
     var body: some View {
-        VStack(spacing: 16) {
-            TextField("Meme name", text: $username)
-                .foregroundColor(Color.black)
-                .background(RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.white))
-                .padding()
-            TextField("Top text", text: $password)
-                .foregroundColor(Color.black)
-                .background(RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.white))
-                .padding()
-//            TextField("Bottom text", text: $bottomtext)
-//                .foregroundColor(Color.black)
-//                .background(RoundedRectangle(cornerRadius: 10 )
-//                    .fill(Color.white))
-            Button("Register") {
-                registerUser()
+        NavigationView {
+            VStack(spacing: 16) {
+                TextField("Meme name", text: $username)
+                    .foregroundColor(Color.black)
+                    .background(RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.white))
+                    .padding()
+                TextField("Top text", text: $password)
+                    .foregroundColor(Color.black)
+                    .background(RoundedRectangle(cornerRadius: 10)
+                        .fill(Color.white))
+                    .padding()
+
+//                Button("tftt") {
+//                    registerUser()
+//                }
+                
+                Button("Register Norm") {
+                    registerUser()
+                }
+
+                Button(action:{}) { // ne rabotaet
+                    NavigationLink(destination: LoginView()) {
+                        ZStack {
+                            RoundedRectangle(cornerRadius: 10)
+                                .foregroundColor(Color.black)
+                                .frame(width: 360, height: 50)
+                            Text("registration")
+                                .foregroundColor(Color.white)
+                                .font(Font(UIFont.medium_26))
+                        }
+                    }
+                }.onTapGesture {
+                    registerUser()
+                }
             }
         }
     }
@@ -51,6 +69,12 @@ struct RegistrationView: View {
         }
     }
 }
+
+//struct RegistrationView: View {
+//    var body: some View {
+//
+//    }
+//}
 
 struct RegistrationView_Previews: PreviewProvider {
     static var previews: some View {
