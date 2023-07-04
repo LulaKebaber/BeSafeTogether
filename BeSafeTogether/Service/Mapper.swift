@@ -15,3 +15,8 @@ struct UserToken: Decodable {
     let access_token: String
     let token_type: String
 } // login
+
+struct UserData: Decodable {
+    let _id: String
+    let email: String
+} // get user data

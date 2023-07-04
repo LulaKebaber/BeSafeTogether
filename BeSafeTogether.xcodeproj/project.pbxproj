@@ -12,6 +12,7 @@
 		251BA1C12A4C616100BF7223 /* Mapper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251BA1C02A4C616100BF7223 /* Mapper.swift */; };
 		251BA1C42A4C82DE00BF7223 /* RegistrationView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251BA1C32A4C82DE00BF7223 /* RegistrationView.swift */; };
 		251BA1C82A4C848100BF7223 /* LoginView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 251BA1C72A4C848100BF7223 /* LoginView.swift */; };
+		2545A2472A53F3A700E36D13 /* KeychainAccess in Frameworks */ = {isa = PBXBuildFile; productRef = 2545A2462A53F3A700E36D13 /* KeychainAccess */; };
 		25E684C62A435111001E6571 /* Helper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E684C52A435111001E6571 /* Helper.swift */; };
 		25E684C82A4352F7001E6571 /* HomeViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E684C72A4352F7001E6571 /* HomeViewModel.swift */; };
 		25E684D02A45CFB2001E6571 /* ContactsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25E684CF2A45CFB2001E6571 /* ContactsView.swift */; };
@@ -48,6 +49,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				2545A2472A53F3A700E36D13 /* KeychainAccess in Frameworks */,
 				251BA1BC2A4C60B500BF7223 /* Moya in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -175,6 +177,7 @@
 			name = BeSafeTogether;
 			packageProductDependencies = (
 				251BA1BB2A4C60B500BF7223 /* Moya */,
+				2545A2462A53F3A700E36D13 /* KeychainAccess */,
 			);
 			productName = BeSafeTogether;
 			productReference = 25FF34D62A42BAC100398411 /* BeSafeTogether.app */;
@@ -206,6 +209,7 @@
 			mainGroup = 25FF34CD2A42BAC100398411;
 			packageReferences = (
 				251BA1BA2A4C60B400BF7223 /* XCRemoteSwiftPackageReference "Moya" */,
+				2545A2452A53F3A700E36D13 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
 			);
 			productRefGroup = 25FF34D72A42BAC100398411 /* Products */;
 			projectDirPath = "";
@@ -459,6 +463,14 @@
 				minimumVersion = 15.0.0;
 			};
 		};
+		2545A2452A53F3A700E36D13 /* XCRemoteSwiftPackageReference "KeychainAccess" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/kishikawakatsumi/KeychainAccess";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -466,6 +478,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 251BA1BA2A4C60B400BF7223 /* XCRemoteSwiftPackageReference "Moya" */;
 			productName = Moya;
+		};
+		2545A2462A53F3A700E36D13 /* KeychainAccess */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 2545A2452A53F3A700E36D13 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
+			productName = KeychainAccess;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

@@ -11,12 +11,13 @@ import Foundation
 enum Service {
     case registerNewUser(username: String, password: String)
     case loginUser(username: String, password: String)
+    case getUserInfo
 }
 
 extension Service: TargetType {
     var baseURL: URL {
-        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
-//        URL(string: "http://localhost:8000")! // на локалку
+//        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
+        URL(string: "http://0.0.0.0:8000")! // на локалку
 
     }
     
@@ -26,6 +27,8 @@ extension Service: TargetType {
             return "/auth/users"
         case .loginUser(_, _):
             return "/auth/users/tokens"
+        case .getUserInfo:
+            return "/auth/users/me"
         }
     }
     
@@ -35,6 +38,8 @@ extension Service: TargetType {
             return .post
         case .loginUser(_, _):
             return .post
+        case .getUserInfo:
+            return .get
         }
     }
     
@@ -57,11 +62,13 @@ extension Service: TargetType {
                 "client_secret": ""
             ]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
+        case .getUserInfo:
+            return .requestPlain
         }
     }
     
     var headers: [String : String]? {
-        
+
         switch self {
         case .registerNewUser(_, _):
             return [
@@ -72,6 +79,8 @@ extension Service: TargetType {
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded"
             ]
+        case .getUserInfo:
+            return ["accept": "application/json"]
         }
 //        ["accept: application/json": "application/json"]
         
