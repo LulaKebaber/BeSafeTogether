@@ -20,3 +20,18 @@ struct UserData: Decodable {
     let _id: String
     let email: String
 } // get user data
+
+//struct UserWords: Decodable {
+//    let words: [String]
+//    let timestamp: [String]
+//} // get words
+
+struct UserWord: Decodable {
+    let word: String
+    let timestamp: String
+}
+
+struct UserWords: Decodable {
+    let words: [UserWord]
+}
+

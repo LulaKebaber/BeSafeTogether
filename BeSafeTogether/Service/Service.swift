@@ -13,13 +13,14 @@ enum Service {
     case loginUser(username: String, password: String)
     case getUserInfo
     case addWord(word: String)
+    case getWords
 }
 
 extension Service: TargetType {
     var baseURL: URL {
 //        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
         URL(string: "http://0.0.0.0:8000")! // на локалку
-
+        
     }
     
     var path: String {
@@ -30,21 +31,17 @@ extension Service: TargetType {
             return "/auth/users/tokens"
         case .getUserInfo:
             return "/auth/users/me"
-        case .addWord(_):
+        case .addWord(_), .getWords:
             return "/auth/users/words"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .registerNewUser(_, _, _, _):
+        case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_):
             return .post
-        case .loginUser(_, _):
-            return .post
-        case .getUserInfo:
+        case .getUserInfo, .getWords:
             return .get
-        case .addWord(_):
-            return .post
         }
     }
     
@@ -69,7 +66,7 @@ extension Service: TargetType {
                 "client_secret": ""
             ]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
-        case .getUserInfo:
+        case .getUserInfo, .getWords:
             return .requestPlain
         case let .addWord(word):
             let parameters: [String: Any] = [
@@ -81,23 +78,17 @@ extension Service: TargetType {
     
     var headers: [String : String]? {
         switch self {
-        case .registerNewUser(_, _, _, _):
+        case .registerNewUser(_, _, _, _), .getUserInfo, .addWord:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/json"
             ]
-        case .loginUser(_, _):
+        case .loginUser(_, _), .getWords:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded"
             ]
-        case .getUserInfo:
-            return ["accept": "application/json"]
-        case .addWord:
-            return [
-                "accept": "application/json",
-                "Content-Type": "application/json"
-            ]
         }
     }
 }
+

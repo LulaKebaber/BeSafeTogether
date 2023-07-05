@@ -20,6 +20,10 @@ struct ProfileView: View {
                 StopWordsView(word: $word, addWordAction: addWord)
                 ContactsButtonView()
                 Spacer()
+                
+                Button(action:{getWords()}) {
+                    Text("dwwd")
+                }
             }
         }
     }
@@ -45,6 +49,43 @@ struct ProfileView: View {
                 print(response)
             case let .failure(error):
                 print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func getWords() {
+        // Retrieve the bearer token from Keychain
+        guard let savedBearerToken = keychain["BearerToken"] else {
+            print("Bearer token not found in Keychain")
+            return
+        }
+        
+        // Create a custom endpoint closure to add the Authorization header
+        let endpointClosure = { (target: Service) -> Endpoint in
+            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
+        }
+        
+        // Create a MoyaProvider instance with the custom endpoint closure
+        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
+        
+        // Make the authenticated request
+        provider.request(.getWords) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let userWords = try response.map(UserWords.self)
+                    let words = userWords.words
+                    for word in words {
+                            print("Word: \(word.word)")
+                            print("Timestamp: \(word.timestamp)")
+                        }
+                    // Handle the received user information
+                } catch {
+                    print("Failed to parse users: \(error)")
+                }
+            case let .failure(error):
+                print("API request failed: \(error)")
             }
         }
     }
@@ -76,7 +117,7 @@ struct ProfileInfoView: View {
                     .resizable()
                     .frame(width: 30.0, height: 30)
                     .foregroundColor(Color.white)
-
+                
             }
             .padding(.leading, 36)
             .padding(.trailing, 45)

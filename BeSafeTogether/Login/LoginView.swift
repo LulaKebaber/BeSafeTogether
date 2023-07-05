@@ -49,7 +49,7 @@ struct LoginView: View {
                 do {
                     let userToken = try response.map(UserToken.self)
                     print(userToken.access_token)
-                    keychain["BearerToken1"] = userToken.access_token
+                    keychain["BearerToken"] = userToken.access_token
                 } catch {
                     print("Failed to parse UserToken: \(error)")
                 }
