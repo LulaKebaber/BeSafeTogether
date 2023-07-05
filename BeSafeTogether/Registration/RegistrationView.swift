@@ -9,72 +9,201 @@ import SwiftUI
 import Moya
 
 struct RegistrationView: View {
-    @State private var username = "name111"
-    @State private var password = "pass"
+    @State var username = ""
+    @State var name = ""
+    @State var phone = ""
+    @State var password = ""
+    @State var repeat_password = ""
+    @State var checkState = false
     
     var body: some View {
-        NavigationView {
-            VStack(spacing: 16) {
-                TextField("Meme name", text: $username)
-                    .foregroundColor(Color.black)
-                    .background(RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.white))
-                    .padding()
-                TextField("Top text", text: $password)
-                    .foregroundColor(Color.black)
-                    .background(RoundedRectangle(cornerRadius: 10)
-                        .fill(Color.white))
-                    .padding()
-
-//                Button("tftt") {
-//                    registerUser()
-//                }
+        
+            VStack {
+                SignUpUsernameInputView(username: $username)
+                    .padding(.top, 20)
+                SignUpNameInputView(name: $name)
+                SignUpPhoneInputView(phone: $phone)
+                SignUpPasswordInputView(password: $password, repeat_password: $repeat_password)
+                Spacer()
+                SignUpTermsInputView(checkState: $checkState)
+                SignUpButtonView()
+                    .padding(.bottom, 30)
                 
-                Button("Register Norm") {
-                    registerUser()
-                }
-
-                Button(action:{}) { // ne rabotaet
-                    NavigationLink(destination: LoginView()) {
-                        ZStack {
-                            RoundedRectangle(cornerRadius: 10)
-                                .foregroundColor(Color.black)
-                                .frame(width: 360, height: 50)
-                            Text("registration")
-                                .foregroundColor(Color.white)
-                                .font(Font(UIFont.medium_26))
-                        }
-                    }
-                }.onTapGesture {
-                    registerUser()
-                }
             }
-        }
+            .navigationBarTitle("Registration")
+        
     }
     
     func registerUser() {
         let provider = MoyaProvider<Service>()
         
-        provider.request(.registerNewUser(username: username, password: password)) {
+        provider.request(.registerNewUser(username: name, password: password)) {
             result in switch result {
-                case let .success(response):
-                    print(response)
-                    let userInfo = try? response.map(UserInfo.self)
-                    print(userInfo?.email as Any)
+            case let .success(response):
+                print(response)
+                let userInfo = try? response.map(UserInfo.self)
+                print(userInfo?.email as Any)
                 
-                case let .failure(error):
-                    // Handle error, display alert, etc.
-                    print("Error: \(error.localizedDescription)")
-                }
+            case let .failure(error):
+                // Handle error, display alert, etc.
+                print("Error: \(error.localizedDescription)")
+            }
         }
     }
 }
 
-//struct RegistrationView: View {
-//    var body: some View {
-//
-//    }
-//}
+struct SignUpUsernameInputView: View {
+    @Binding var username: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+//            Text("Registration")
+//                .font(Font(UIFont.bold_32))
+//                .padding(.bottom, 20)
+            Text("Username")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Enter your username", text: $username)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }.padding(.top, 10)
+    }
+}
+
+struct SignUpNameInputView: View {
+    @Binding var name: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Full Name")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Enter your full name", text: $name)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }.padding(.top, 10)
+    }
+}
+
+struct SignUpPhoneInputView: View {
+    @Binding var phone: String
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Phone Number")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Enter your phone number", text: $phone)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }.padding(.top, 10)
+    }
+}
+
+struct SignUpPasswordInputView: View {
+    @Binding var password: String
+    @Binding var repeat_password: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Password")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Enter your password", text: $password)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }
+        .padding(.top, 10)
+        
+        VStack(alignment: .leading) {
+            Text("Repeat Password")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Repeat your password", text: $password)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }
+        .padding(.top, 10)
+    }
+}
+
+struct SignUpButtonView: View {
+    var body: some View {
+        Button(action:{}) {
+            NavigationLink(destination: LoginView()) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 30)
+                        .foregroundColor(Color.black)
+                        .frame(width: 330, height: 55)
+                    Text("Sign Up")
+                        .foregroundColor(Color.white)
+                        .font(Font(UIFont.medium_18))
+                }
+            }
+        }
+    }
+}
+
+struct SignUpTermsInputView: View {
+    @Binding var checkState: Bool
+    var body: some View {
+        HStack {
+            Button(action: { self.checkState.toggle() }) {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: checkState ? "checkmark.square.fill" : "square")
+                        .foregroundColor(Color.black)
+                        .font(.system(size: 22))
+                }
+            }
+            Text("I agree with terms and conditions")
+                .font(Font(UIFont.regular_18))
+        }
+    }
+}
 
 struct RegistrationView_Previews: PreviewProvider {
     static var previews: some View {

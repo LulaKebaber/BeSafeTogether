@@ -10,7 +10,7 @@ import SwiftUI
 struct HomeView: View {
     
     @ObservedObject var viewModel = HomeViewModel()
-        
+    
     var body: some View {
         VStack {
             Text("Welcome Home!")
@@ -50,6 +50,10 @@ struct MicButton: View {
 }
 
 struct RequirementsList: View {
+    @State var checkState1 = false
+    @State var checkState2 = false
+    @State var checkState3 = false
+    
     var body: some View {
         ZStack {
             Rectangle()
@@ -63,9 +67,9 @@ struct RequirementsList: View {
                     .font(Font(UIFont.regular_26))
                     .padding(.bottom, 10)
                 
-                OptionView(text: "Gps is enabled")
-                OptionView(text: "Contacts are set")
-                OptionView(text: "Stop words are set")
+                OptionView(text: "Gps is enabled", checkState: $checkState1)
+                OptionView(text: "Contacts are set", checkState: $checkState2)
+                OptionView(text: "Stop words are set", checkState: $checkState3)
             }
         }
     }
@@ -73,29 +77,29 @@ struct RequirementsList: View {
 
 struct OptionView: View {
     var text: String
+    @Binding var checkState: Bool
     
     var body: some View {
         HStack {
-            RoundedRectangle(cornerRadius: 4)
-                .foregroundColor(Color.black)
-                .frame(width: 23, height: 23)
-                .overlay(
-                    RoundedRectangle(cornerRadius: 3)
-                        .stroke(Color.white, lineWidth: 2.5)
-                    )
-                    .padding(.leading, 50)
+            Button(action: { self.checkState.toggle() }) {
+                HStack(alignment: .top, spacing: 10) {
+                    Image(systemName: checkState ? "checkmark.square.fill" : "square")
+                        .foregroundColor(Color.white)
+                        .font(.system(size: 30))
+                }
+            }
             Text(text)
                 .foregroundColor(Color.white)
                 .font(Font(UIFont.medium_18))
-                .padding(.leading, 4)
             Spacer()
             Button(action: {}){
                 Image(systemName: "arrow.forward")
                     .foregroundColor(Color.white)
                     .font(.system(size: 25))
-                    .padding(.trailing, 50)
             }
-        }.padding(.bottom, 15)
+        }
+        .padding([.leading, .trailing], 47)
+        .padding(.bottom, 3)
     }
 }
 

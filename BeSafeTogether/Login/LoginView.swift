@@ -11,32 +11,27 @@ import KeychainAccess
 
 
 struct LoginView: View {
-    @State private var username = "name1"
-    @State private var password = "pass1"
+    @State private var username = ""
+    @State private var password = ""
     let keychain = Keychain(service: "com.yourapp.service")
     
     var body: some View {
-        VStack(spacing: 16) {
-            TextField("Meme name", text: $username)
-                .foregroundColor(Color.black)
-                .background(RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.white))
-                .padding()
-            TextField("Top text", text: $password)
-                .foregroundColor(Color.black)
-                .background(RoundedRectangle(cornerRadius: 10)
-                    .fill(Color.white))
-                .padding()
-            Button("Register") {
-                loginUser()
-            }
-            //            Button("get token") {
-            //                checkToken()
-            //            }
-            Button("get info") {
-                getUserInfo()
-            }
-        }
+        VStack() {
+//            Text("Sign in")
+//                .font(Font(UIFont.bold_32))
+            
+            SignInUsernameInputView(username: $username)
+            SignInPasswordInputView(password: $password)
+            SignInButtonView()
+                .padding(.top, 28)
+            HStack() {
+                ForgotPasswordButtonView()
+                    .padding(.leading, 30)
+                Spacer()
+                PrivacyPolicyButtonView()
+                    .padding(.trailing, 30)
+            }.padding(.top, 10)
+        }.navigationBarTitle("Sign In")
     }
     
     func loginUser() {
@@ -57,7 +52,6 @@ struct LoginView: View {
             }
         }
     }
-    
     func getUserInfo() {
         // Retrieve the bearer token from Keychain
         guard let savedBearerToken = keychain["BearerToken1"] else {
@@ -91,6 +85,89 @@ struct LoginView: View {
         }
         
         
+    }
+}
+
+struct SignInUsernameInputView: View {
+    @Binding var username: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Username or Phone")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Enter your username", text: $username)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }.padding(.top, 10)
+    }
+}
+
+struct SignInPasswordInputView: View {
+    @Binding var password: String
+    
+    var body: some View {
+        VStack(alignment: .leading) {
+            Text("Password")
+                .font(Font(UIFont.medium_18))
+            VStack {
+                TextField("Enter your password", text: $password)
+                    .textFieldStyle(.automatic)
+                    .frame(width: 300)
+                    .padding(.top, 13)
+                Spacer()
+            }
+            .background(RoundedRectangle(cornerRadius: 3)
+                .foregroundColor(Color.white)
+                .frame(width: 330, height: 50)
+                .overlay(RoundedRectangle(cornerRadius: 3)
+                    .stroke(Color.black, lineWidth: 1.3)))
+            .frame(width: 330, height: 50)
+        }.padding(.top, 10)
+    }
+}
+
+struct SignInButtonView: View {
+    var body: some View {
+        Button(action:{}) {
+            NavigationLink(destination: TabBarView()) {
+                ZStack {
+                    RoundedRectangle(cornerRadius: 30)
+                        .foregroundColor(Color.black)
+                        .frame(width: 330, height: 55)
+                    Text("Sign in")
+                        .foregroundColor(Color.white)
+                        .font(Font(UIFont.medium_18))
+                }
+            }
+        }
+    }
+}
+
+struct ForgotPasswordButtonView: View {
+    var body: some View {
+        Button(action:{}) {
+            Text("Forgot password?")
+                .font(Font(UIFont.regular_14))
+        }
+    }
+}
+
+struct PrivacyPolicyButtonView: View {
+    var body: some View {
+        Button(action:{}) {
+            Text("Privacy and Policy")
+                .font(Font(UIFont.regular_14))
+        }
     }
 }
 

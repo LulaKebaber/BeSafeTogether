@@ -11,6 +11,7 @@ import UIKit
 extension UIFont {
     static let bold_32 = UIFont.systemFont(ofSize: 32, weight: .bold, width: .standard)
     static let bold_26 = UIFont.systemFont(ofSize: 26, weight: .bold, width: .standard)
+    static let bold_22 = UIFont.systemFont(ofSize: 22, weight: .bold, width: .standard)
     
     static let medium_26 = UIFont.systemFont(ofSize: 26, weight: .medium, width: .standard)
     static let medium_22 = UIFont.systemFont(ofSize: 22, weight: .medium, width: .standard)
