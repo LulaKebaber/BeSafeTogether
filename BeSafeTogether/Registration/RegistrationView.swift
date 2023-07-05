@@ -15,37 +15,37 @@ struct RegistrationView: View {
     @State var password = ""
     @State var repeat_password = ""
     @State var checkState = false
+    @State var isActive = false
     
     var body: some View {
-        
-            VStack {
-                SignUpUsernameInputView(username: $username)
-                    .padding(.top, 20)
-                SignUpNameInputView(name: $name)
-                SignUpPhoneInputView(phone: $phone)
-                SignUpPasswordInputView(password: $password, repeat_password: $repeat_password)
-                Spacer()
-                SignUpTermsInputView(checkState: $checkState)
-                SignUpButtonView()
-                    .padding(.bottom, 30)
-                
+        VStack {
+            SignUpUsernameInputView(username: $username)
+                .padding(.top, 20)
+            SignUpNameInputView(name: $name)
+            SignUpPhoneInputView(phone: $phone)
+            SignUpPasswordInputView(password: $password, repeat_password: $repeat_password)
+            Spacer()
+            SignUpTermsInputView(checkState: $checkState)
+            SignUpButtonView(action: registerUser, isActive: $isActive)
+                .padding(.bottom, 30)
+        }
+        .navigationBarTitle("Registration")
+        .background(
+            NavigationLink(destination: LoginView(), isActive: $isActive) {
+                EmptyView()
             }
-            .navigationBarTitle("Registration")
-        
+        )
     }
     
     func registerUser() {
         let provider = MoyaProvider<Service>()
         
-        provider.request(.registerNewUser(username: name, password: password)) {
+        provider.request(.registerNewUser(username: name, name: name, phone: phone, password: password)) {
             result in switch result {
             case let .success(response):
+                print(result)
                 print(response)
-                let userInfo = try? response.map(UserInfo.self)
-                print(userInfo?.email as Any)
-                
             case let .failure(error):
-                // Handle error, display alert, etc.
                 print("Error: \(error.localizedDescription)")
             }
         }
@@ -57,9 +57,9 @@ struct SignUpUsernameInputView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-//            Text("Registration")
-//                .font(Font(UIFont.bold_32))
-//                .padding(.bottom, 20)
+            //            Text("Registration")
+            //                .font(Font(UIFont.bold_32))
+            //                .padding(.bottom, 20)
             Text("Username")
                 .font(Font(UIFont.medium_18))
             VStack {
@@ -172,17 +172,21 @@ struct SignUpPasswordInputView: View {
 }
 
 struct SignUpButtonView: View {
+    var action: () -> Void
+    @Binding var isActive: Bool
+    
     var body: some View {
-        Button(action:{}) {
-            NavigationLink(destination: LoginView()) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 30)
-                        .foregroundColor(Color.black)
-                        .frame(width: 330, height: 55)
-                    Text("Sign Up")
-                        .foregroundColor(Color.white)
-                        .font(Font(UIFont.medium_18))
-                }
+        Button(action: {
+            action()
+            isActive = true
+        }) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 30)
+                    .foregroundColor(Color.black)
+                    .frame(width: 330, height: 55)
+                Text("Sign Up")
+                    .foregroundColor(Color.white)
+                    .font(Font(UIFont.medium_18))
             }
         }
     }

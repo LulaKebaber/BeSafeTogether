@@ -6,15 +6,45 @@
 //
 
 import SwiftUI
+import Moya
+import KeychainAccess
 
 struct ProfileView: View {
+    @State var word: String = ""
+    let keychain = Keychain(service: "com.BeSafeTogether.service")
+    
     var body: some View {
         NavigationView {
             VStack {
                 ProfileInfoView()
-                StopWordsView()
+                StopWordsView(word: $word, addWordAction: addWord)
                 ContactsButtonView()
                 Spacer()
+            }
+        }
+    }
+    
+    func addWord() {
+        guard let savedBearerToken = keychain["BearerToken"] else {
+            print("Bearer token not found in Keychain")
+            return
+        }
+        
+        // Create a custom endpoint closure to add the Authorization header
+        let endpointClosure = { (target: Service) -> Endpoint in
+            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
+        }
+        
+        // Create a MoyaProvider instance with the custom endpoint closure
+        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
+        
+        provider.request(.addWord(word: word)) {
+            result in switch result {
+            case let .success(response):
+                print(response)
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
             }
         }
     }
@@ -55,6 +85,9 @@ struct ProfileInfoView: View {
 }
 
 struct StopWordsView: View {
+    @Binding var word: String
+    var addWordAction: () -> Void
+    
     var body: some View {
         VStack {
             Text("Stop Words")
@@ -63,7 +96,7 @@ struct StopWordsView: View {
             WordView(word: "Help")
             WordView(word: "Apple")
             WordView(word: "Bread")
-            AddWordView()
+            AddWordView(word: $word, addWordAction: addWordAction)
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
@@ -102,7 +135,8 @@ struct WordView: View {
 }
 
 struct AddWordView: View {
-    @State var word = ""
+    @Binding var word: String
+    var addWordAction: () -> Void
     
     var body: some View {
         HStack {
@@ -110,7 +144,7 @@ struct AddWordView: View {
                 .padding()
                 .textFieldStyle(RoundedBorderTextFieldStyle())
             
-            Button(action: {}){
+            Button(action: {addWordAction()}){
                 ZStack {
                     RoundedRectangle(cornerRadius: 5)
                         .foregroundColor(Color.black)

@@ -13,7 +13,8 @@ import KeychainAccess
 struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
-    let keychain = Keychain(service: "com.yourapp.service")
+    @State var isActive = false
+    let keychain = Keychain(service: "com.BeSafeTogether.service")
     
     var body: some View {
         VStack() {
@@ -22,7 +23,7 @@ struct LoginView: View {
             
             SignInUsernameInputView(username: $username)
             SignInPasswordInputView(password: $password)
-            SignInButtonView()
+            SignInButtonView(action: loginUser, isActive: $isActive)
                 .padding(.top, 28)
             HStack() {
                 ForgotPasswordButtonView()
@@ -31,7 +32,13 @@ struct LoginView: View {
                 PrivacyPolicyButtonView()
                     .padding(.trailing, 30)
             }.padding(.top, 10)
-        }.navigationBarTitle("Sign In")
+        }
+        .navigationBarTitle("Sign In")
+        .background(
+            NavigationLink(destination: TabBarView(), isActive: $isActive) {
+                EmptyView()
+            }
+        )
     }
     
     func loginUser() {
@@ -54,7 +61,7 @@ struct LoginView: View {
     }
     func getUserInfo() {
         // Retrieve the bearer token from Keychain
-        guard let savedBearerToken = keychain["BearerToken1"] else {
+        guard let savedBearerToken = keychain["BearerToken"] else {
             print("Bearer token not found in Keychain")
             return
         }
@@ -83,8 +90,6 @@ struct LoginView: View {
                 print("API request failed: \(error)")
             }
         }
-        
-        
     }
 }
 
@@ -137,17 +142,22 @@ struct SignInPasswordInputView: View {
 }
 
 struct SignInButtonView: View {
+    
+    var action: () -> Void
+    @Binding var isActive: Bool
+    
     var body: some View {
-        Button(action:{}) {
-            NavigationLink(destination: TabBarView()) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 30)
-                        .foregroundColor(Color.black)
-                        .frame(width: 330, height: 55)
-                    Text("Sign in")
-                        .foregroundColor(Color.white)
-                        .font(Font(UIFont.medium_18))
-                }
+        Button(action: {
+            action()
+            isActive = true
+        }) {
+            ZStack {
+                RoundedRectangle(cornerRadius: 30)
+                    .foregroundColor(Color.black)
+                    .frame(width: 330, height: 55)
+                Text("Sign Up")
+                    .foregroundColor(Color.white)
+                    .font(Font(UIFont.medium_18))
             }
         }
     }

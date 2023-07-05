@@ -9,9 +9,10 @@ import Moya
 import Foundation
 
 enum Service {
-    case registerNewUser(username: String, password: String)
+    case registerNewUser(username: String, name: String, phone: String, password: String)
     case loginUser(username: String, password: String)
     case getUserInfo
+    case addWord(word: String)
 }
 
 extension Service: TargetType {
@@ -23,31 +24,37 @@ extension Service: TargetType {
     
     var path: String {
         switch self {
-        case .registerNewUser(_, _):
+        case .registerNewUser(_, _, _, _):
             return "/auth/users"
         case .loginUser(_, _):
             return "/auth/users/tokens"
         case .getUserInfo:
             return "/auth/users/me"
+        case .addWord(_):
+            return "/auth/users/words"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .registerNewUser(_, _):
+        case .registerNewUser(_, _, _, _):
             return .post
         case .loginUser(_, _):
             return .post
         case .getUserInfo:
             return .get
+        case .addWord(_):
+            return .post
         }
     }
     
     var task: Moya.Task {
         switch self {
-        case let .registerNewUser(username, password):
+        case let .registerNewUser(username, name, phone, password):
             let parameters: [String: Any] = [
-                "email": username,
+                "username": username,
+                "name": name,
+                "phone": phone,
                 "password": password
             ]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
@@ -64,14 +71,19 @@ extension Service: TargetType {
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
         case .getUserInfo:
             return .requestPlain
+        case let .addWord(word):
+            let parameters: [String: Any] = [
+                "word": word,
+            ]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         }
     }
     
     var headers: [String : String]? {
-
         switch self {
-        case .registerNewUser(_, _):
+        case .registerNewUser(_, _, _, _):
             return [
+                "accept": "application/json",
                 "Content-Type": "application/json"
             ]
         case .loginUser(_, _):
@@ -81,8 +93,11 @@ extension Service: TargetType {
             ]
         case .getUserInfo:
             return ["accept": "application/json"]
+        case .addWord:
+            return [
+                "accept": "application/json",
+                "Content-Type": "application/json"
+            ]
         }
-//        ["accept: application/json": "application/json"]
-        
     }
 }
