@@ -11,13 +11,15 @@ import KeychainAccess
 
 struct ProfileView: View {
     @State var word: String = ""
+    @State var words: [(String, String)] = []
     let keychain = Keychain(service: "com.BeSafeTogether.service")
+    
     
     var body: some View {
         NavigationView {
             VStack {
                 ProfileInfoView()
-                StopWordsView(word: $word, addWordAction: addWord)
+                StopWordsView(word: $word, words: $words, addWordAction: addWord)
                 ContactsButtonView()
                 Spacer()
                 
@@ -74,12 +76,11 @@ struct ProfileView: View {
             switch result {
             case let .success(response):
                 do {
-                    let userWords = try response.map(UserWords.self)
-                    let words = userWords.words
-                    for word in words {
-                            print("Word: \(word.word)")
-                            print("Timestamp: \(word.timestamp)")
-                        }
+                    let userWords = try response.map(UserWords.self).words
+                    for word in userWords {
+                        words.append((word.word, word.timestamp))
+                    }
+                    print(words)
                     // Handle the received user information
                 } catch {
                     print("Failed to parse users: \(error)")
@@ -127,6 +128,7 @@ struct ProfileInfoView: View {
 
 struct StopWordsView: View {
     @Binding var word: String
+    @Binding var words: [(String, String)]
     var addWordAction: () -> Void
     
     var body: some View {
@@ -134,10 +136,20 @@ struct StopWordsView: View {
             Text("Stop Words")
                 .font(Font(UIFont.bold_26))
                 .padding(.top, 20)
-            WordView(word: "Help")
-            WordView(word: "Apple")
-            WordView(word: "Bread")
+                .fixedSize(horizontal: false, vertical: true)
+            
+            ScrollView {
+                VStack {
+                    ForEach(words.indices, id: \.self) { index in
+                        WordView(word: words[index].0, date: words[index].1)
+                            .padding(.horizontal, 10) // Add horizontal padding
+                    }
+                }
+                .padding(.bottom, 20)
+            }
+            
             AddWordView(word: $word, addWordAction: addWordAction)
+                .padding(.horizontal, 10) // Add horizontal padding
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
@@ -148,6 +160,9 @@ struct StopWordsView: View {
         .frame(width: 360, height: 380)
     }
 }
+
+
+
 
 struct WordView: View {
     var word : String
@@ -169,9 +184,9 @@ struct WordView: View {
         .padding()
         .background(RoundedRectangle(cornerRadius: 10)
             .fill(Color.white)
-            .frame(width: 330, height: 70)
+            .frame(width: 320, height: 70)
             .shadow(color: Color.gray.opacity(0.5), radius: 3, x: 0, y: 2))
-        .frame(width: 330, height: 70)
+        .frame(width: 320, height: 70)
     }
 }
 
