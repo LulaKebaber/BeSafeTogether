@@ -161,9 +161,6 @@ struct StopWordsView: View {
     }
 }
 
-
-
-
 struct WordView: View {
     var word : String
     var date = "15 oct, 2022 - 10:23"

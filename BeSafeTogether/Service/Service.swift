@@ -14,6 +14,7 @@ enum Service {
     case getUserInfo
     case addWord(word: String)
     case getWords
+    case addContact(name: String, phone: String, gps: Bool)
 }
 
 extension Service: TargetType {
@@ -33,12 +34,14 @@ extension Service: TargetType {
             return "/auth/users/me"
         case .addWord(_), .getWords:
             return "/auth/users/words"
+        case .addContact(_, _, _):
+            return "/auth/users/contacts"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_):
+        case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_), .addContact(_, _, _):
             return .post
         case .getUserInfo, .getWords:
             return .get
@@ -73,12 +76,19 @@ extension Service: TargetType {
                 "word": word,
             ]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case let .addContact(name, phone, gps):
+            let parameters: [String: Any] = [
+                "name": name,
+                "phone": phone,
+                "gps": gps
+            ]
+            return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         }
     }
     
     var headers: [String : String]? {
         switch self {
-        case .registerNewUser(_, _, _, _), .getUserInfo, .addWord:
+        case .registerNewUser(_, _, _, _), .getUserInfo, .addWord, .addContact(_, _, _):
             return [
                 "accept": "application/json",
                 "Content-Type": "application/json"
