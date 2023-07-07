@@ -15,6 +15,7 @@ enum Service {
     case addWord(word: String)
     case getWords
     case addContact(name: String, phone: String, gps: Bool)
+    case getContacts
 }
 
 extension Service: TargetType {
@@ -34,7 +35,7 @@ extension Service: TargetType {
             return "/auth/users/me"
         case .addWord(_), .getWords:
             return "/auth/users/words"
-        case .addContact(_, _, _):
+        case .addContact(_, _, _), .getContacts:
             return "/auth/users/contacts"
         }
     }
@@ -43,7 +44,7 @@ extension Service: TargetType {
         switch self {
         case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_), .addContact(_, _, _):
             return .post
-        case .getUserInfo, .getWords:
+        case .getUserInfo, .getWords, .getContacts:
             return .get
         }
     }
@@ -69,8 +70,6 @@ extension Service: TargetType {
                 "client_secret": ""
             ]
             return .requestParameters(parameters: parameters, encoding: URLEncoding.default)
-        case .getUserInfo, .getWords:
-            return .requestPlain
         case let .addWord(word):
             let parameters: [String: Any] = [
                 "word": word,
@@ -83,6 +82,8 @@ extension Service: TargetType {
                 "gps": gps
             ]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case .getUserInfo, .getWords, .getContacts:
+            return .requestPlain
         }
     }
     
@@ -93,7 +94,7 @@ extension Service: TargetType {
                 "accept": "application/json",
                 "Content-Type": "application/json"
             ]
-        case .loginUser(_, _), .getWords:
+        case .loginUser(_, _), .getWords, .getContacts:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded"

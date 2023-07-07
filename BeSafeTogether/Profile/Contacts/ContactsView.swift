@@ -19,13 +19,15 @@ struct ContactsView: View {
     @State var lastName = ""
     @State var phoneNumber = ""
     @State var gps = false
-        
+    
+    @State var contacts: [(String, String, Bool)] = []
+    
     var body: some View {
         VStack {
             Text("My Contacts")
                 .font(Font(UIFont.bold_32))
             
-            ContactsListView()
+            ContactsListView(contacts: $contacts)
             Spacer()
             HStack {
                 Text("Your default message:")
@@ -38,13 +40,13 @@ struct ContactsView: View {
             .padding([.leading, .trailing], 30)
             MessageView()
                 .padding(.bottom, 25)
+            
+            Button(action:{getContacts()}) {
+                Text("hello")
+            }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, addContactAction: addContact))
-        
-        Button(action:{addContact()}) {
-            Text("dwdwdw")
-        }
+        .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: addContact))
     }
     
     func addContact() {
@@ -71,16 +73,61 @@ struct ContactsView: View {
             }
         }
     }
+    
+    func getContacts() {
+        // Retrieve the bearer token from Keychain
+        guard let savedBearerToken = keychain["BearerToken"] else {
+            print("Bearer token not found in Keychain")
+            return
+        }
+        
+        // Create a custom endpoint closure to add the Authorization header
+        let endpointClosure = { (target: Service) -> Endpoint in
+            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
+            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
+        }
+        
+        // Create a MoyaProvider instance with the custom endpoint closure
+        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
+        
+        // Make the authenticated request
+        provider.request(.getContacts) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let userContacts = try response.map(UserContacts.self).contacts
+                    for contact in userContacts {
+                        contacts.append((contact.name, contact.phone, contact.gps))
+                    }
+                    print(contacts)
+                    // Handle the received user information
+                } catch {
+                    print("Failed to parse users: \(error)")
+                }
+            case let .failure(error):
+                print("API request failed: \(error)")
+            }
+        }
+    }
 }
 
 struct ContactsListView: View {
+    @Binding var contacts: [(String, String, Bool)]
+    
     var body: some View {
-        VStack {
-            ContactView(ContactName: "Даниал", ContactPhoneNumber: "+77783845500")
-            ContactView(ContactName: "Алишер", ContactPhoneNumber: "+770138455232")
-            ContactView(ContactName: "Абай", ContactPhoneNumber: "+77056544545")
+        ScrollView {
+            VStack {
+                ForEach(contacts.indices, id: \.self) { index in
+                    ContactView(
+                        ContactName: contacts[index].0,
+                        ContactPhoneNumber: contacts[index].1,
+                        gps: contacts[index].2
+                    )
+                    .padding(.bottom, 10) // Add spacing between contacts
+                }
+            }
+            .padding()
         }
-        .padding()
     }
 }
 
@@ -88,7 +135,7 @@ struct ContactView: View {
     
     @State var ContactName: String
     @State var ContactPhoneNumber: String
-    @State var gps: String = ""
+    @State var gps: Bool
     
     var body: some View {
         HStack {
@@ -160,6 +207,7 @@ struct AddContactButtonView: View {
     @Binding var firstName: String
     @Binding var lastName: String
     @Binding var phoneNumber: String
+    @Binding var gps: Bool
     var addContactAction: () -> Void // New closure for addContact action
     
     var body: some View {
@@ -171,17 +219,17 @@ struct AddContactButtonView: View {
                 .foregroundColor(Color.black)
         }
         .sheet(isPresented: $isAddingContact) {
-            NewContactView(firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, addContactAction: addContactAction) // Pass the addContactAction closure to NewContactView
+            NewContactView(firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: addContactAction) // Pass the addContactAction closure to NewContactView
         }
     }
 }
-
 
 struct NewContactView: View {
     @Environment(\.presentationMode) var presentationMode
     @Binding var firstName: String
     @Binding var lastName: String
     @Binding var phoneNumber: String
+    @Binding var gps: Bool
     var addContactAction: () -> Void // New closure for addContact action
     
     var body: some View {
@@ -196,6 +244,11 @@ struct NewContactView: View {
                     TextField("Phone Number", text: $phoneNumber)
                         .keyboardType(.phonePad)
                 }
+                Section(header: Text("Receive Notifications")) {
+                    Toggle(isOn: $gps) {
+                        Text("Receive Notifications")
+                    }
+                }
             }
             .navigationBarTitle("New Contact")
             .navigationBarItems(
@@ -206,7 +259,7 @@ struct NewContactView: View {
                     addContactAction() // Call the addContactAction closure
                     presentationMode.wrappedValue.dismiss()
                 }
-                .disabled(firstName.isEmpty || lastName.isEmpty || phoneNumber.isEmpty)
+                    .disabled(firstName.isEmpty || lastName.isEmpty || phoneNumber.isEmpty)
             )
         }
     }

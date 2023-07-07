@@ -24,31 +24,18 @@ struct UserData: Decodable {
 struct UserWord: Decodable {
     let word: String
     let timestamp: String
-}
+} // get user words
 
 struct UserWords: Decodable {
     let words: [UserWord]
-}
+} // get user words
 
 struct UserContact: Decodable {
     let name: String
     let phone: String
     let gps: Bool
-    
-    enum CodingKeys: String, CodingKey {
-        case name
-        case phone
-        case gps
-    }
-    
-    init(from decoder: Decoder) throws {
-        let container = try decoder.container(keyedBy: CodingKeys.self)
-        name = try container.decode(String.self, forKey: .name)
-        phone = try container.decode(String.self, forKey: .phone)
-        gps = try container.decode(Bool.self, forKey: .gps)
-    }
-}
+} // get user contacts
 
 struct UserContacts: Decodable {
     let contacts: [UserContact]
-}
+} // get user contacts

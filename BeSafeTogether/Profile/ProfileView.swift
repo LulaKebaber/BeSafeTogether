@@ -14,7 +14,6 @@ struct ProfileView: View {
     @State var words: [(String, String)] = []
     let keychain = Keychain(service: "com.BeSafeTogether.service")
     
-    
     var body: some View {
         NavigationView {
             VStack {
