@@ -19,10 +19,12 @@ struct ContactsView: View {
     @State var lastName = ""
     @State var phoneNumber = ""
     @State var gps = false
+    @State var isLoad = false
     
     @State var contacts: [(String, String, Bool)] = []
     
     var body: some View {
+        
         VStack {
             Text("My Contacts")
                 .font(Font(UIFont.bold_32))
@@ -41,12 +43,13 @@ struct ContactsView: View {
             MessageView()
                 .padding(.bottom, 25)
             
-            Button(action:{getContacts()}) {
+            Button(action: { getContacts() }) {
                 Text("hello")
             }
         }
         .navigationBarBackButtonHidden(true)
         .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: addContact))
+        
     }
     
     func addContact() {
@@ -99,6 +102,7 @@ struct ContactsView: View {
                     for contact in userContacts {
                         contacts.append((contact.name, contact.phone, contact.gps))
                     }
+                    //                    complition()
                     print(contacts)
                     // Handle the received user information
                 } catch {
@@ -128,6 +132,7 @@ struct ContactsListView: View {
             }
             .padding()
         }
+        .frame(height: 280)
     }
 }
 

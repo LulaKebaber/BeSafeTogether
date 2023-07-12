@@ -7,9 +7,9 @@
 
 import Foundation
 
+
 class HomeViewModel: ObservableObject {
     @Published var isGpsEnabled = false
     @Published var isContactsSet = false
     @Published var isStopWordsSet = false
 }
-

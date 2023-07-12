@@ -13,6 +13,7 @@ struct ProfileView: View {
     @State var word: String = ""
     @State var words: [(String, String)] = []
     let keychain = Keychain(service: "com.BeSafeTogether.service")
+    @ObservedObject var homeViewModel = HomeViewModel()
     
     var body: some View {
         NavigationView {
@@ -23,7 +24,7 @@ struct ProfileView: View {
                 Spacer()
                 
                 Button(action:{getWords()}) {
-                    Text("dwwd")
+                    Text("press me")
                 }
             }
         }
@@ -80,6 +81,7 @@ struct ProfileView: View {
                         words.append((word.word, word.timestamp))
                     }
                     print(words)
+                    homeViewModel.isStopWordsSet = true
                     // Handle the received user information
                 } catch {
                     print("Failed to parse users: \(error)")
@@ -88,6 +90,7 @@ struct ProfileView: View {
                 print("API request failed: \(error)")
             }
         }
+//        homeViewModel.isStopWordsSet = true
     }
 }
 
@@ -141,7 +144,7 @@ struct StopWordsView: View {
                 VStack {
                     ForEach(words.indices, id: \.self) { index in
                         WordView(word: words[index].0, date: words[index].1)
-                            .padding(.horizontal, 10) // Add horizontal padding
+                            .padding(.horizontal, 10)
                     }
                 }
                 .padding(.bottom, 20)

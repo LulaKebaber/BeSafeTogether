@@ -18,9 +18,6 @@ struct LoginView: View {
     
     var body: some View {
         VStack() {
-//            Text("Sign in")
-//                .font(Font(UIFont.bold_32))
-            
             SignInUsernameInputView(username: $username)
             SignInPasswordInputView(password: $password)
             SignInButtonView(action: loginUser, isActive: $isActive)
