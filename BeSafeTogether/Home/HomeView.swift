@@ -1,11 +1,5 @@
-//
-//  HomeView.swift
-//  BeSafeTogether
-//
-//  Created by Danial Baizak on 21.06.2023.
-//
-
 import SwiftUI
+import AVFoundation
 
 enum MicButtonView {
     case noRequirements
@@ -13,65 +7,129 @@ enum MicButtonView {
 }
 
 struct HomeView: View {
-    
     @ObservedObject var homeViewModel = HomeViewModel()
+    @State private var isRecording = false
     
     var body: some View {
         VStack {
             Text("Welcome Home!")
-                .font(Font(UIFont.bold_32))
+                .font(.title)
                 .padding(.top, 30)
-            //            Text(homeViewModel.isStopWordsSet)
-            MicButton(homeViewModel: homeViewModel)
-                .padding(.top, 60)
             
+            MicButton(homeViewModel: homeViewModel, isRecording: $isRecording)
+                .padding(.top, 60)
+            Button(action:{if let recordingPath = getFullRecordingPath() {
+                print("Recording Path: \(recordingPath.path)")
+            }}) {
+                Text(
+                    "dwdw"
+                )
+            }
             Spacer()
             
             RequirementsList(homeViewModel: homeViewModel)
                 .padding(.bottom, 25)
         }
     }
+    
+    func getFullRecordingPath() -> URL? {
+        let fileManager = FileManager.default
+        guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        
+        let recordingFileName = "recording.mp3" // Update the file name and extension if needed
+        
+        return documentsDirectory.appendingPathComponent(recordingFileName)
+    }
 }
 
 struct MicButton: View {
     @ObservedObject var homeViewModel: HomeViewModel
-    @State private var selectedView: MicButtonView = .noRequirements
+    @Binding var isRecording: Bool
     
     var body: some View {
-        ZStack {
-            Circle()
-                .foregroundColor(Color("gray 25"))
-                .frame(width: 220)
-            
-            VStack {
-                switch selectedView {
-                case .noRequirements:
-                    Image(systemName: "mic.fill")
-                        .resizable()
-                        .frame(width: 55, height: 80)
-                        .foregroundColor(Color("gray 50"))
-                    Text("No requirements")
-                        .font(Font(UIFont.semibold_18))
-                        .padding(.top, 14)
-                        .foregroundColor(Color("gray 50"))
-                case .requirementsMet:
-                    Image(systemName: "mic.fill")
-                        .resizable()
-                        .frame(width: 80, height: 80)
-                        .foregroundColor(.green)
-                    Text("Requirements met")
-                        .font(Font(UIFont.semibold_18))
-                        .padding(.top, 14)
-                        .foregroundColor(.green)
+        Button(action: {
+            if self.homeViewModel.isRequirementsMet {
+                self.isRecording.toggle()
+                
+                if self.isRecording {
+                    AudioRecorder.shared.startRecording()
+                } else {
+                    AudioRecorder.shared.stopRecording()
+                }
+            }
+        }) {
+            ZStack {
+                Circle()
+                    .foregroundColor(Color("gray 25"))
+                    .frame(width: 220)
+                VStack {
+                    switch homeViewModel.isRequirementsMet {
+                    case true:
+                        Image(systemName: "mic.fill")
+                            .resizable()
+                            .frame(width: 55, height: 80)
+                            .foregroundColor(isRecording ? .red : .green)
+                        Text(isRecording ? "Stop Recording" : "Start Recording")
+                            .font(.system(size: 18, weight: .semibold))
+                            .padding(.top, 14)
+                            .foregroundColor(isRecording ? .red : .green)
+                    case false:
+                        Image(systemName: "mic.fill")
+                            .resizable()
+                            .frame(width: 55, height: 80)
+                            .foregroundColor(Color("gray 50"))
+                        Text("No requirements")
+                            .font(.system(size: 18, weight: .semibold))
+                            .padding(.top, 14)
+                            .foregroundColor(Color("gray 50"))
+                    }
                 }
             }
         }
     }
 }
 
+class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
+    static let shared = AudioRecorder()
+    
+    private var audioRecorder: AVAudioRecorder!
+    private let recordingDuration: TimeInterval = 10.0
+    
+    private override init() {
+        super.init()
+    }
+    
+    func startRecording() {
+        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.wav")
+        let settings = [
+            AVFormatIDKey: kAudioFormatLinearPCM,
+            AVSampleRateKey: 44100,
+            AVNumberOfChannelsKey: 2,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ] as [String : Any]
+        
+        do {
+            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
+            audioRecorder.delegate = self
+            audioRecorder.record(forDuration: recordingDuration)
+        } catch {
+            print("Failed to start recording: \(error.localizedDescription)")
+        }
+    }
+    
+    func stopRecording() {
+        audioRecorder.stop()
+    }
+    
+    private func getDocumentsDirectory() -> URL {
+        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
+    }
+}
 
 struct RequirementsList: View {
-    @ObservedObject var homeViewModel = HomeViewModel()
+    @ObservedObject var homeViewModel: HomeViewModel
     
     var body: some View {
         ZStack {
@@ -81,9 +139,9 @@ struct RequirementsList: View {
                 .cornerRadius(25)
                 .padding(10)
             VStack {
-                Text("Requieremnts to use")
+                Text("Requirements to use")
                     .foregroundColor(Color.white)
-                    .font(Font(UIFont.regular_26))
+                    .font(.system(size: 26))
                     .padding(.bottom, 10)
                 
                 OptionView(text: "Gps is enabled", checkState: homeViewModel.isGpsEnabled)
@@ -109,7 +167,7 @@ struct OptionView: View {
             }
             Text(text)
                 .foregroundColor(Color.white)
-                .font(Font(UIFont.medium_18))
+                .font(.system(size: 18))
             Spacer()
             Button(action: {}){
                 Image(systemName: "arrow.forward")

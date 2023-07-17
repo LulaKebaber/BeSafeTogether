@@ -9,7 +9,12 @@ import Foundation
 
 
 class HomeViewModel: ObservableObject {
-    @Published var isGpsEnabled = false
-    @Published var isContactsSet = false
-    @Published var isStopWordsSet = false
+    @Published var isGpsEnabled = true
+    @Published var isContactsSet = true
+    @Published var isStopWordsSet = true
+    @Published var recordings: [String] = []
+    
+    var isRequirementsMet: Bool {
+        return isGpsEnabled && isContactsSet && isStopWordsSet
+    }
 }
