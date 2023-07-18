@@ -21,11 +21,13 @@ struct HomeView: View {
             Button(action:{if let recordingPath = getFullRecordingPath() {
                 print("Recording Path: \(recordingPath.path)")
             }}) {
-                Text(
-                    "dwdw"
-                )
+                Text("dwdw")
             }
             Spacer()
+            
+//            ForEach(homeViewModel.recordedFiles, id: \.self) { fileURL in
+//                Text(fileURL.lastPathComponent)
+//            }
             
             RequirementsList(homeViewModel: homeViewModel)
                 .padding(.bottom, 25)
@@ -50,16 +52,16 @@ struct MicButton: View {
     
     var body: some View {
         Button(action: {
-            if self.homeViewModel.isRequirementsMet {
-                self.isRecording.toggle()
-                
-                if self.isRecording {
-                    AudioRecorder.shared.startRecording()
-                } else {
-                    AudioRecorder.shared.stopRecording()
-                }
-            }
-        }) {
+                    if self.homeViewModel.isRequirementsMet {
+                        self.isRecording.toggle()
+
+                        if self.isRecording {
+                            AudioRecorder.shared.startRecording()
+                        } else {
+                            AudioRecorder.shared.stopRecording()
+                        }
+                    }
+                }) {
             ZStack {
                 Circle()
                     .foregroundColor(Color("gray 25"))
@@ -87,42 +89,56 @@ struct MicButton: View {
                     }
                 }
             }
+            .onChange(of: isRecording) { newValue in
+                        if !newValue {
+                            // Stop recording when the button is clicked again
+                            AudioRecorder.shared.stopRecording()
+                        }
+                    }
         }
     }
 }
 
 class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
     static let shared = AudioRecorder()
-    
-    private var audioRecorder: AVAudioRecorder!
+
+    private var audioRecorder: AVAudioRecorder?
     private let recordingDuration: TimeInterval = 10.0
-    
+    private var recordingIndex = 1 // Initialize recording index
+
+    @Published var recordedFiles: [URL] = []
+
     private override init() {
         super.init()
     }
-    
+
     func startRecording() {
-        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording.wav")
+        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording\(recordingIndex).wav")
         let settings = [
             AVFormatIDKey: kAudioFormatLinearPCM,
             AVSampleRateKey: 44100,
             AVNumberOfChannelsKey: 2,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ] as [String : Any]
-        
+        ] as [String: Any]
+
         do {
             audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
-            audioRecorder.delegate = self
-            audioRecorder.record(forDuration: recordingDuration)
+            audioRecorder?.delegate = self
+            audioRecorder?.record(forDuration: recordingDuration)
         } catch {
             print("Failed to start recording: \(error.localizedDescription)")
         }
     }
-    
+
     func stopRecording() {
-        audioRecorder.stop()
+        audioRecorder?.stop()
+        guard let recordedURL = audioRecorder?.url else { return }
+        recordedFiles.append(recordedURL)
+        audioRecorder = nil
+
+        recordingIndex += 1 // Increment the recording index
     }
-    
+
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
