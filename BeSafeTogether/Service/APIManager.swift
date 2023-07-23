@@ -12,10 +12,9 @@ import KeychainAccess
 struct APIManager {
     static let shared = APIManager()
     
-    let keychain = Keychain(service: "com.BeSafeTogether.service") // Changed access level to 'internal'
+    let keychain = Keychain(service: "com.BeSafeTogether.service")
     
-    // Removed the access modifier for 'provider' to make it 'internal'
-    var provider: MoyaProvider<Service> {
+    var bearerProvider: MoyaProvider<Service> {
         // Retrieve the bearer token from Keychain
         guard let savedBearerToken = keychain["BearerToken"] else {
             print("Bearer token not found in Keychain")
@@ -32,67 +31,118 @@ struct APIManager {
         return MoyaProvider<Service>(endpointClosure: endpointClosure)
     }
     
-    func addWord(word: String, completion: @escaping () -> Void) {
-            let provider = self.provider
-
-            provider.request(.addWord(word: word)) { result in
-                switch result {
-                case .success:
-                    // Call the completion handler after successfully adding the word
-                    completion()
-                case let .failure(error):
-                    print("Error: \(error.localizedDescription)")
-                }
+    let provider = MoyaProvider<Service>()
+    
+    func registerNewUser(username: String, name: String, phone: String, password: String) {
+        let provider = self.provider
+        
+        provider.request(.registerNewUser(username: username, name: name, phone: phone, password: password)) { result in
+            switch result {
+            case .success:
+                print(result)
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
             }
         }
+    }
+    
+    func loginUser(username: String, password: String) {
+        let provider = self.provider
+        
+        provider.request(.loginUser(username: username, password: password)) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let userToken = try response.map(UserToken.self)
+                    self.keychain["BearerToken"] = userToken.access_token
+                } catch {
+                    print("Failed to parse UserToken: \(error)")
+                }
+            case let .failure(error):
+                // Handle error, display alert, etc.
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func getUserInfo() {
+        
+        let provider = self.bearerProvider
+        
+        provider.request(.getUserInfo) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let users = try response.map(UserData.self)
+                } catch {
+                    print("Failed to parse users: \(error)")
+                }
+            case let .failure(error):
+                print("API request failed: \(error)")
+            }
+        }
+    }
+    
+    func addWord(word: String, completion: @escaping () -> Void) {
+        let provider = self.bearerProvider
+        
+        provider.request(.addWord(word: word)) { result in
+            switch result {
+            case .success:
+                completion()
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
     
     func getWords(completion: @escaping ([UserWord]) -> Void) {
-            let provider = self.provider
-            
-            provider.request(.getWords) { result in
-                switch result {
-                case let .success(response):
-                    do {
-                        let userWords = try response.map(UserWords.self).words
-                        completion(userWords)
-                    } catch {
-                        print("Failed to parse users: \(error)")
-                    }
-                case let .failure(error):
-                    print("API request failed: \(error)")
+        let provider = self.bearerProvider
+        
+        provider.request(.getWords) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let userWords = try response.map(UserWords.self).words
+                    completion(userWords)
+                } catch {
+                    print("Failed to parse users: \(error)")
                 }
+            case let .failure(error):
+                print("API request failed: \(error)")
             }
         }
+    }
     
     func addContact(firstName: String, lastName: String, phoneNumber: String, gps: Bool, completion: @escaping () -> Void) {
-            let provider = self.provider
-            let name = firstName + " " + lastName
-
-            provider.request(.addContact(name: name, phone: phoneNumber, gps: gps)) { result in
-                switch result {
-                case .success:
-                    completion()
-                case let .failure(error):
-                    print("Error: \(error.localizedDescription)")
-                }
+        let provider = self.bearerProvider
+        let name = firstName + " " + lastName
+        
+        provider.request(.addContact(name: name, phone: phoneNumber, gps: gps)) { result in
+            switch result {
+            case .success:
+                completion()
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
             }
         }
+    }
     
     func getContacts(completion: @escaping ([UserContact]) -> Void) {
-            let provider = self.provider
-
-            provider.request(.getContacts) { result in
-                switch result {
-                case let .success(response):
-                    do {
-                        let userContacts = try response.map(UserContacts.self).contacts
-                        completion(userContacts)
-                    } catch {
-                        print("Failed to parse users: \(error)")
-                    }
-                case let .failure(error):
-                    print("API request failed: \(error)")
+        let provider = self.bearerProvider
+        
+        provider.request(.getContacts) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let userContacts = try response.map(UserContacts.self).contacts
+                    completion(userContacts)
+                } catch {
+                    print("Failed to parse users: \(error)")
                 }
+            case let .failure(error):
+                print("API request failed: \(error)")
             }
         }
+    }
 }

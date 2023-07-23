@@ -17,6 +17,9 @@ struct GetStartedView: View {
                 LoginButtonView()
                     .padding(.bottom, 40)
             }.navigationBarHidden(true)
+                .onAppear {
+                    print(232323)
+                }
         }
     }
 }

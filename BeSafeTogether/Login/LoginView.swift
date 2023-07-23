@@ -39,55 +39,12 @@ struct LoginView: View {
     }
     
     func loginUser() {
-        let provider = MoyaProvider<Service>()
-        provider.request(.loginUser(username: username, password: password)) {
-            result in switch result {
-            case let .success(response):
-                do {
-                    let userToken = try response.map(UserToken.self)
-                    print(userToken.access_token)
-                    keychain["BearerToken"] = userToken.access_token
-                } catch {
-                    print("Failed to parse UserToken: \(error)")
-                }
-            case let .failure(error):
-                // Handle error, display alert, etc.
-                print("Error: \(error.localizedDescription)")
-            }
+            APIManager.shared.loginUser(username: username, password: password)
         }
-    }
-    func getUserInfo() {
-        // Retrieve the bearer token from Keychain
-        guard let savedBearerToken = keychain["BearerToken"] else {
-            print("Bearer token not found in Keychain")
-            return
+
+        func getUserInfo() {
+            APIManager.shared.getUserInfo()
         }
-        
-        // Create a custom endpoint closure to add the Authorization header
-        let endpointClosure = { (target: Service) -> Endpoint in
-            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
-        }
-        
-        // Create a MoyaProvider instance with the custom endpoint closure
-        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
-        
-        // Make the authenticated request
-        provider.request(.getUserInfo) { result in
-            switch result {
-            case let .success(response):
-                do {
-                    let users = try response.map(UserData.self)
-                    print(users)
-                    // Handle the received user information
-                } catch {
-                    print("Failed to parse users: \(error)")
-                }
-            case let .failure(error):
-                print("API request failed: \(error)")
-            }
-        }
-    }
 }
 
 struct SignInUsernameInputView: View {
