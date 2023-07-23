@@ -3,7 +3,7 @@
 //  BeSafeTogether
 //
 //  Created by Danial Baizak on 04.07.2023.
-//
+// test
 
 import SwiftUI
 
