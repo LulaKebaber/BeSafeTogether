@@ -21,7 +21,7 @@ enum Service {
 extension Service: TargetType {
     var baseURL: URL {
 //        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
-        URL(string: "http://0.0.0.0:8000")! // на локалку
+        URL(string: "http://localhost:8000")! // на локалку
         
     }
     
@@ -102,4 +102,3 @@ extension Service: TargetType {
         }
     }
 }
-
