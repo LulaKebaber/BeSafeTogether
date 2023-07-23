@@ -57,9 +57,6 @@ struct SignUpUsernameInputView: View {
     
     var body: some View {
         VStack(alignment: .leading) {
-            //            Text("Registration")
-            //                .font(Font(UIFont.bold_32))
-            //                .padding(.bottom, 20)
             Text("Username")
                 .font(Font(UIFont.medium_18))
             VStack {

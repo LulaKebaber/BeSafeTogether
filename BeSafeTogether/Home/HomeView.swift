@@ -103,8 +103,9 @@ class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
     static let shared = AudioRecorder()
 
     private var audioRecorder: AVAudioRecorder?
-    private let recordingDuration: TimeInterval = 10.0
+    private let recordingDuration: TimeInterval = 5
     private var recordingIndex = 1 // Initialize recording index
+    private var isContinuouslyRecording = false // New variable to track if we're in continuous mode
 
     @Published var recordedFiles: [URL] = []
 
@@ -113,6 +114,11 @@ class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
     }
 
     func startRecording() {
+        isContinuouslyRecording = true // Start continuous recording
+        startNewRecording()
+    }
+    
+    private func startNewRecording() {
         let audioFilename = getDocumentsDirectory().appendingPathComponent("recording\(recordingIndex).wav")
         let settings = [
             AVFormatIDKey: kAudioFormatLinearPCM,
@@ -131,18 +137,30 @@ class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
     }
 
     func stopRecording() {
+        isContinuouslyRecording = false // Stop continuous recording
         audioRecorder?.stop()
-        guard let recordedURL = audioRecorder?.url else { return }
-        recordedFiles.append(recordedURL)
         audioRecorder = nil
-
-        recordingIndex += 1 // Increment the recording index
     }
+
+    // This delegate method is called when a recording has finished
+    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
+        let recordedURL = recorder.url
+        recordedFiles.append(recordedURL)
+        recordingIndex += 1 // Increment the recording index
+
+        if isContinuouslyRecording {
+            // If we are in continuous mode, start a new recording
+            startNewRecording()
+        }
+    }
+
 
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
 }
+
+
 
 struct RequirementsList: View {
     @ObservedObject var homeViewModel: HomeViewModel

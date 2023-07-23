@@ -14,6 +14,7 @@ struct ProfileView: View {
     @State var words: [(String, String)] = []
     let keychain = Keychain(service: "com.BeSafeTogether.service")
     @ObservedObject var homeViewModel = HomeViewModel()
+    let provider = APIManager.shared.provider
     
     var body: some View {
         NavigationView {
@@ -22,76 +23,27 @@ struct ProfileView: View {
                 StopWordsView(word: $word, words: $words, addWordAction: addWord)
                 ContactsButtonView()
                 Spacer()
-                
-                Button(action:{getWords()}) {
-                    Text("press me")
-                }
+            }
+            .onAppear {
+                getWords()
             }
         }
     }
     
     func addWord() {
-        guard let savedBearerToken = keychain["BearerToken"] else {
-            print("Bearer token not found in Keychain")
-            return
-        }
-        
-        // Create a custom endpoint closure to add the Authorization header
-        let endpointClosure = { (target: Service) -> Endpoint in
-            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
-        }
-        
-        // Create a MoyaProvider instance with the custom endpoint closure
-        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
-        
-        provider.request(.addWord(word: word)) {
-            result in switch result {
-            case let .success(response):
-                print(response)
-            case let .failure(error):
-                print("Error: \(error.localizedDescription)")
+            APIManager.shared.addWord(word: word) {
+                getWords()
             }
         }
-    }
     
     func getWords() {
-        // Retrieve the bearer token from Keychain
-        guard let savedBearerToken = keychain["BearerToken"] else {
-            print("Bearer token not found in Keychain")
-            return
-        }
-        
-        // Create a custom endpoint closure to add the Authorization header
-        let endpointClosure = { (target: Service) -> Endpoint in
-            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
-        }
-        
-        // Create a MoyaProvider instance with the custom endpoint closure
-        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
-        
-        // Make the authenticated request
-        provider.request(.getWords) { result in
-            switch result {
-            case let .success(response):
-                do {
-                    let userWords = try response.map(UserWords.self).words
-                    for word in userWords {
-                        words.append((word.word, word.timestamp))
-                    }
-                    print(words)
+            APIManager.shared.getWords { userWords in
+                DispatchQueue.main.async {
+                    self.words = userWords.map { ($0.word, $0.timestamp) }
                     homeViewModel.isStopWordsSet = true
-                    // Handle the received user information
-                } catch {
-                    print("Failed to parse users: \(error)")
                 }
-            case let .failure(error):
-                print("API request failed: \(error)")
             }
         }
-//        homeViewModel.isStopWordsSet = true
-    }
 }
 
 struct ProfileInfoView: View {

@@ -24,6 +24,7 @@
 		25FF34EC2A43217B00398411 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34EB2A43217B00398411 /* MapView.swift */; };
 		25FF34EE2A43226100398411 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34ED2A43226100398411 /* HomeView.swift */; };
 		25FF34F02A43227400398411 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34EF2A43227400398411 /* ProfileView.swift */; };
+		D2FFD9262A6A583E00E30BCC /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2FFD9252A6A583E00E30BCC /* APIManager.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -44,6 +45,7 @@
 		25FF34EB2A43217B00398411 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		25FF34ED2A43226100398411 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		25FF34EF2A43227400398411 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		D2FFD9252A6A583E00E30BCC /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -64,6 +66,7 @@
 			children = (
 				251BA1BD2A4C60D600BF7223 /* Service.swift */,
 				251BA1C02A4C616100BF7223 /* Mapper.swift */,
+				D2FFD9252A6A583E00E30BCC /* APIManager.swift */,
 			);
 			path = Service;
 			sourceTree = "<group>";
@@ -246,6 +249,7 @@
 				25E684D02A45CFB2001E6571 /* ContactsView.swift in Sources */,
 				25E684C82A4352F7001E6571 /* HomeViewModel.swift in Sources */,
 				25FF34F02A43227400398411 /* ProfileView.swift in Sources */,
+				D2FFD9262A6A583E00E30BCC /* APIManager.swift in Sources */,
 				251BA1C82A4C848100BF7223 /* LoginView.swift in Sources */,
 				251BA1BE2A4C60D600BF7223 /* Service.swift in Sources */,
 				25FF34EC2A43217B00398411 /* MapView.swift in Sources */,

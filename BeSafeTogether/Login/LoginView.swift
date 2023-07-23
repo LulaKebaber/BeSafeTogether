@@ -56,6 +56,7 @@ struct LoginView: View {
             }
         }
     }
+    
     func getUserInfo() {
         // Retrieve the bearer token from Keychain
         guard let savedBearerToken = keychain["BearerToken"] else {

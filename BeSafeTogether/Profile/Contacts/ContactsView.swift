@@ -13,6 +13,7 @@ import KeychainAccess
 struct ContactsView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
     let keychain = Keychain(service: "com.BeSafeTogether.service")
+    let provider = APIManager.shared.provider
     @State var isAddingContact = false
     
     @State var firstName = ""
@@ -53,66 +54,18 @@ struct ContactsView: View {
     }
     
     func addContact() {
-        guard let savedBearerToken = keychain["BearerToken"] else {
-            print("Bearer token not found in Keychain")
-            return
-        }
-        
-        // Create a custom endpoint closure to add the Authorization header
-        let endpointClosure = { (target: Service) -> Endpoint in
-            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
-        }
-        
-        // Create a MoyaProvider instance with the custom endpoint closure
-        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
-        let name = firstName + " " + lastName
-        provider.request(.addContact(name: name, phone: phoneNumber, gps: gps)) {
-            result in switch result {
-            case let .success(response):
-                print(response)
-            case let .failure(error):
-                print("Error: \(error.localizedDescription)")
+            APIManager.shared.addContact(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, gps: gps) {
+                getContacts()
             }
         }
-    }
     
     func getContacts() {
-        // Retrieve the bearer token from Keychain
-        guard let savedBearerToken = keychain["BearerToken"] else {
-            print("Bearer token not found in Keychain")
-            return
-        }
-        
-        // Create a custom endpoint closure to add the Authorization header
-        let endpointClosure = { (target: Service) -> Endpoint in
-            let defaultEndpoint = MoyaProvider.defaultEndpointMapping(for: target)
-            return defaultEndpoint.adding(newHTTPHeaderFields: ["Authorization": "Bearer \(savedBearerToken)"])
-        }
-        
-        // Create a MoyaProvider instance with the custom endpoint closure
-        let provider = MoyaProvider<Service>(endpointClosure: endpointClosure)
-        
-        // Make the authenticated request
-        provider.request(.getContacts) { result in
-            switch result {
-            case let .success(response):
-                do {
-                    let userContacts = try response.map(UserContacts.self).contacts
-                    for contact in userContacts {
-                        contacts.append((contact.name, contact.phone, contact.gps))
-                    }
-                    //                    complition()
-                    print(contacts)
-                    // Handle the received user information
-                } catch {
-                    print("Failed to parse users: \(error)")
+            APIManager.shared.getContacts { userContacts in
+                DispatchQueue.main.async { // Ensure UI updates are done on the main thread
+                    self.contacts = userContacts.map { ($0.name, $0.phone, $0.gps) }
                 }
-            case let .failure(error):
-                print("API request failed: \(error)")
             }
         }
-    }
 }
 
 struct ContactsListView: View {
