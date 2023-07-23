@@ -25,22 +25,23 @@ struct ProfileView: View {
                 Spacer()
             }
             .onAppear {
-                getWords()
+                getWords(homeViewModel: homeViewModel)
             }
         }
     }
     
     func addWord() {
             APIManager.shared.addWord(word: word) {
-                getWords()
+                getWords(homeViewModel: homeViewModel)
             }
         }
     
-    func getWords() {
+    func getWords(homeViewModel: HomeViewModel) {
             APIManager.shared.getWords { userWords in
                 DispatchQueue.main.async {
                     self.words = userWords.map { ($0.word, $0.timestamp) }
-                    homeViewModel.isStopWordsSet = true
+                    // Check if the words variable is empty or not
+                    homeViewModel.isStopWordsSet = !userWords.isEmpty
                 }
             }
         }

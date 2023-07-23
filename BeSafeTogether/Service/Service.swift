@@ -22,7 +22,6 @@ extension Service: TargetType {
     var baseURL: URL {
 //        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
         URL(string: "http://localhost:8000")! // на локалку
-        
     }
     
     var path: String {

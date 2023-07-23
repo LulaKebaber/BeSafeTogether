@@ -104,7 +104,7 @@ struct APIManager {
             case let .success(response):
                 do {
                     let userWords = try response.map(UserWords.self).words
-                    completion(userWords)
+                    completion(userWords) // Call the completion block with the userWords
                 } catch {
                     print("Failed to parse users: \(error)")
                 }
@@ -113,6 +113,7 @@ struct APIManager {
             }
         }
     }
+
     
     func addContact(firstName: String, lastName: String, phoneNumber: String, gps: Bool, completion: @escaping () -> Void) {
         let provider = self.bearerProvider

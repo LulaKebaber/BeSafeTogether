@@ -18,31 +18,10 @@ struct HomeView: View {
             
             MicButton(homeViewModel: homeViewModel, isRecording: $isRecording)
                 .padding(.top, 60)
-            Button(action:{if let recordingPath = getFullRecordingPath() {
-                print("Recording Path: \(recordingPath.path)")
-            }}) {
-                Text("dwdw")
-            }
             Spacer()
-            
-//            ForEach(homeViewModel.recordedFiles, id: \.self) { fileURL in
-//                Text(fileURL.lastPathComponent)
-//            }
-            
             RequirementsList(homeViewModel: homeViewModel)
                 .padding(.bottom, 25)
         }
-    }
-    
-    func getFullRecordingPath() -> URL? {
-        let fileManager = FileManager.default
-        guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return nil
-        }
-        
-        let recordingFileName = "recording.mp3" // Update the file name and extension if needed
-        
-        return documentsDirectory.appendingPathComponent(recordingFileName)
     }
 }
 
@@ -54,12 +33,6 @@ struct MicButton: View {
         Button(action: {
                     if self.homeViewModel.isRequirementsMet {
                         self.isRecording.toggle()
-
-                        if self.isRecording {
-                            AudioRecorder.shared.startRecording()
-                        } else {
-                            AudioRecorder.shared.stopRecording()
-                        }
                     }
                 }) {
             ZStack {
@@ -89,78 +62,9 @@ struct MicButton: View {
                     }
                 }
             }
-            .onChange(of: isRecording) { newValue in
-                        if !newValue {
-                            // Stop recording when the button is clicked again
-                            AudioRecorder.shared.stopRecording()
-                        }
-                    }
         }
     }
 }
-
-class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
-    static let shared = AudioRecorder()
-
-    private var audioRecorder: AVAudioRecorder?
-    private let recordingDuration: TimeInterval = 5
-    private var recordingIndex = 1 // Initialize recording index
-    private var isContinuouslyRecording = false // New variable to track if we're in continuous mode
-
-    @Published var recordedFiles: [URL] = []
-
-    private override init() {
-        super.init()
-    }
-
-    func startRecording() {
-        isContinuouslyRecording = true // Start continuous recording
-        startNewRecording()
-    }
-    
-    private func startNewRecording() {
-        let audioFilename = getDocumentsDirectory().appendingPathComponent("recording\(recordingIndex).wav")
-        let settings = [
-            AVFormatIDKey: kAudioFormatLinearPCM,
-            AVSampleRateKey: 44100,
-            AVNumberOfChannelsKey: 2,
-            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ] as [String: Any]
-
-        do {
-            audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
-            audioRecorder?.delegate = self
-            audioRecorder?.record(forDuration: recordingDuration)
-        } catch {
-            print("Failed to start recording: \(error.localizedDescription)")
-        }
-    }
-
-    func stopRecording() {
-        isContinuouslyRecording = false // Stop continuous recording
-        audioRecorder?.stop()
-        audioRecorder = nil
-    }
-
-    // This delegate method is called when a recording has finished
-    func audioRecorderDidFinishRecording(_ recorder: AVAudioRecorder, successfully flag: Bool) {
-        let recordedURL = recorder.url
-        recordedFiles.append(recordedURL)
-        recordingIndex += 1 // Increment the recording index
-
-        if isContinuouslyRecording {
-            // If we are in continuous mode, start a new recording
-            startNewRecording()
-        }
-    }
-
-
-    private func getDocumentsDirectory() -> URL {
-        FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-    }
-}
-
-
 
 struct RequirementsList: View {
     @ObservedObject var homeViewModel: HomeViewModel
@@ -189,7 +93,7 @@ struct RequirementsList: View {
 struct OptionView: View {
     var text: String
     @State var checkState: Bool
-    
+      
     var body: some View {
         HStack {
             Button(action: { self.checkState.toggle() }) {
