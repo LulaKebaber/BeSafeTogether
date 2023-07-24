@@ -53,18 +53,19 @@ struct ContactsView: View {
     }
     
     func addContact() {
-            APIManager.shared.addContact(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, gps: gps) {
-                getContacts()
-            }
+        APIManager.shared.addContact(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, gps: gps) {
+            getContacts()
         }
+    }
     
     func getContacts() {
-            APIManager.shared.getContacts { userContacts in
-                DispatchQueue.main.async { // Ensure UI updates are done on the main thread
-                    self.contacts = userContacts.map { ($0.name, $0.phone, $0.gps) }
-                }
+        APIManager.shared.getContacts { userContacts in
+            DispatchQueue.main.async { // Ensure UI updates are done on the main thread
+                self.contacts = userContacts.map { ($0.name, $0.phone, $0.gps) }
             }
+            WordsAndContactsStorage.shared.contacts = .init(contacts: userContacts)
         }
+    }
 }
 
 struct ContactsListView: View {

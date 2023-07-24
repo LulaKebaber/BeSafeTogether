@@ -34,7 +34,7 @@ struct MicButton: View {
                     if self.homeViewModel.isRequirementsMet {
                         self.isRecording.toggle()
                     }
-                }) {
+               }) {
             ZStack {
                 Circle()
                     .foregroundColor(Color("gray 25"))

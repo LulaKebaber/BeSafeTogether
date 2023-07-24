@@ -15,6 +15,7 @@ struct LoginView: View {
     @State private var password = ""
     @State var isActive = false
     let keychain = Keychain(service: "com.BeSafeTogether.service")
+    let defaults = UserDefaults.standard
     
     var body: some View {
         VStack() {
@@ -47,10 +48,6 @@ struct LoginView: View {
                 WordsAndContactsStorage.shared.contacts = .init(contacts: contacts)
             }
         }
-    }
-
-    func getUserInfo() {
-        APIManager.shared.getUserInfo()
     }
 }
 

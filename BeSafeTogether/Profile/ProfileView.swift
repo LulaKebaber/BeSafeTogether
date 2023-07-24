@@ -12,15 +12,9 @@ import KeychainAccess
 struct ProfileView: View {
     @State var word: String = ""
     @State var words: [(String, String)] = []
-    let keychain = Keychain(service: "com.BeSafeTogether.service")
     @ObservedObject var homeViewModel = HomeViewModel()
+    let keychain = Keychain(service: "com.BeSafeTogether.service")
     let provider = APIManager.shared.provider
-    
-    init(word: String = "", words: [(String, String)] = [], homeViewModel: HomeViewModel = HomeViewModel()) {
-        self.word = word
-        self.words = words
-        self.homeViewModel = homeViewModel
-    }
     
     var body: some View {
         NavigationView {
@@ -37,16 +31,17 @@ struct ProfileView: View {
     }
     
     func addWord() {
-            APIManager.shared.addWord(word: word) {
-                getWords(homeViewModel: homeViewModel)
-            }
+        APIManager.shared.addWord(word: word) {
+            getWords(homeViewModel: homeViewModel)
         }
+    }
     
     func getWords(homeViewModel: HomeViewModel) {
             APIManager.shared.getWords { userWords in
                 DispatchQueue.main.async {
                     self.words = userWords.map { ($0.word, $0.timestamp) }
                 }
+                WordsAndContactsStorage.shared.words = .init(words: userWords)
             }
         }
 }

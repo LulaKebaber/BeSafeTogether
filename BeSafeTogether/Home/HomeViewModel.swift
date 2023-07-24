@@ -10,12 +10,15 @@ import Foundation
 
 class HomeViewModel: ObservableObject {
     @Published var isGpsEnabled = false
-    @Published var isContactsSet = false
+    var isContactsSet: Bool {
+        guard let userWords = WordsAndContactsStorage.shared.contacts else { return false }
+        return !userWords.contacts.isEmpty
+    }
+    
     var isStopWordsSet: Bool {
         guard let userWords = WordsAndContactsStorage.shared.words else { return false }
         return !userWords.words.isEmpty
     }
-    @Published var recordings: [String] = []
     
     var isRequirementsMet: Bool {
         return isGpsEnabled && isContactsSet && isStopWordsSet
