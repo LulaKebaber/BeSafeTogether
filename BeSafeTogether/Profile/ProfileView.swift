@@ -16,6 +16,12 @@ struct ProfileView: View {
     @ObservedObject var homeViewModel = HomeViewModel()
     let provider = APIManager.shared.provider
     
+    init(word: String = "", words: [(String, String)] = [], homeViewModel: HomeViewModel = HomeViewModel()) {
+        self.word = word
+        self.words = words
+        self.homeViewModel = homeViewModel
+    }
+    
     var body: some View {
         NavigationView {
             VStack {
@@ -40,8 +46,6 @@ struct ProfileView: View {
             APIManager.shared.getWords { userWords in
                 DispatchQueue.main.async {
                     self.words = userWords.map { ($0.word, $0.timestamp) }
-                    // Check if the words variable is empty or not
-                    homeViewModel.isStopWordsSet = !userWords.isEmpty
                 }
             }
         }

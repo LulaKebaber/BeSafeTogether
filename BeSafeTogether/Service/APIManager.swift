@@ -46,7 +46,7 @@ struct APIManager {
         }
     }
     
-    func loginUser(username: String, password: String) {
+    func loginUser(username: String, password: String, completion: (() -> Void)? = nil) {
         let provider = self.provider
         
         provider.request(.loginUser(username: username, password: password)) { result in
@@ -58,6 +58,7 @@ struct APIManager {
                 } catch {
                     print("Failed to parse UserToken: \(error)")
                 }
+                completion?()
             case let .failure(error):
                 // Handle error, display alert, etc.
                 print("Error: \(error.localizedDescription)")

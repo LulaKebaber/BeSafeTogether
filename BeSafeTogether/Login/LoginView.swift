@@ -39,12 +39,26 @@ struct LoginView: View {
     }
     
     func loginUser() {
-            APIManager.shared.loginUser(username: username, password: password)
+        APIManager.shared.loginUser(username: username, password: password) {
+            APIManager.shared.getWords { words in
+                WordsAndContactsStorage.shared.words = .init(words: words)
+            }
+            APIManager.shared.getContacts { contacts in
+                WordsAndContactsStorage.shared.contacts = .init(contacts: contacts)
+            }
         }
+    }
 
-        func getUserInfo() {
-            APIManager.shared.getUserInfo()
-        }
+    func getUserInfo() {
+        APIManager.shared.getUserInfo()
+    }
+}
+
+class WordsAndContactsStorage: ObservableObject {
+    static let shared: WordsAndContactsStorage = WordsAndContactsStorage()
+    
+    @Published var words: UserWords?
+    @Published var contacts: UserContacts?
 }
 
 struct SignInUsernameInputView: View {
