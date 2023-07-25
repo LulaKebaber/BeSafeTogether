@@ -8,6 +8,7 @@
 import SwiftUI
 import Moya
 import KeychainAccess
+import AVFoundation
 
 struct ProfileView: View {
     @State var word: String = ""
@@ -23,9 +24,6 @@ struct ProfileView: View {
                 StopWordsView(word: $word, words: $words, addWordAction: addWord)
                 ContactsButtonView()
                 Spacer()
-            }
-            .onAppear {
-                getWords(homeViewModel: homeViewModel)
             }
         }
     }

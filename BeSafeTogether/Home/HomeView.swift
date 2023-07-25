@@ -8,6 +8,7 @@ enum MicButtonView {
 
 struct HomeView: View {
     @ObservedObject var homeViewModel = HomeViewModel()
+    @ObservedObject var wordsAndContactsStorage = WordsAndContactsStorage()
     @State private var isRecording = false
     
     var body: some View {
@@ -22,19 +23,50 @@ struct HomeView: View {
             RequirementsList(homeViewModel: homeViewModel)
                 .padding(.bottom, 25)
         }
+        .onReceive(wordsAndContactsStorage.$words) { _ in
+            print(10000000)
+        }
+        .onReceive(wordsAndContactsStorage.$contacts) { _ in
+            print(10000000)
+        }
+    }
+    
+    func getWords(homeViewModel: HomeViewModel) {
+        APIManager.shared.getWords { userWords in
+            WordsAndContactsStorage.shared.words = .init(words: userWords)
+        }
     }
 }
+
 
 struct MicButton: View {
     @ObservedObject var homeViewModel: HomeViewModel
     @Binding var isRecording: Bool
-    
+
+    // Add an instance of AVAudioRecorder
+    @State var audioRecorder: AVAudioRecorder!
+    @State var recordCount = 0
+    @State var timer: Timer? = nil
+
     var body: some View {
         Button(action: {
-                    if self.homeViewModel.isRequirementsMet {
-                        self.isRecording.toggle()
+            if self.homeViewModel.isRequirementsMet {
+                self.isRecording.toggle()
+
+                if self.isRecording {
+                    self.startRecording()
+                    self.timer = Timer.scheduledTimer(withTimeInterval: 10.0, repeats: true) { _ in
+                        self.stopRecording()
+                        self.recordCount += 1
+                        self.startRecording()
                     }
-               }) {
+                } else {
+                    self.timer?.invalidate()
+                    self.timer = nil
+                    self.stopRecording()
+                }
+            }
+        }) {
             ZStack {
                 Circle()
                     .foregroundColor(Color("gray 25"))
@@ -64,7 +96,45 @@ struct MicButton: View {
             }
         }
     }
+
+    func startRecording() {
+        let filename = getDocumentsDirectory().appendingPathComponent("recording\(self.recordCount).wav")
+
+        let settings = [
+            AVFormatIDKey: Int(kAudioFormatLinearPCM),
+            AVSampleRateKey: 44100,
+            AVNumberOfChannelsKey: 2,
+            AVLinearPCMBitDepthKey: 16,
+            AVLinearPCMIsBigEndianKey: false,
+            AVLinearPCMIsFloatKey: false,
+            AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
+        ] as [String : Any]
+
+        do {
+            audioRecorder = try AVAudioRecorder(url: filename, settings: settings)
+            audioRecorder.record()
+            print("Started recording: \(filename)")
+        } catch {
+            print("Could not start recording")
+        }
+    }
+
+    func stopRecording() {
+        if audioRecorder != nil {
+            audioRecorder.stop()
+            audioRecorder = nil
+            print("Stopped recording")
+        } else {
+            print("Tried to stop recording, but audioRecorder was nil.")
+        }
+    }
+
+    func getDocumentsDirectory() -> URL {
+        let paths = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
+        return paths[0]
+    }
 }
+
 
 struct RequirementsList: View {
     @ObservedObject var homeViewModel: HomeViewModel
@@ -93,7 +163,7 @@ struct RequirementsList: View {
 struct OptionView: View {
     var text: String
     @State var checkState: Bool
-      
+    
     var body: some View {
         HStack {
             Button(action: { self.checkState.toggle() }) {
