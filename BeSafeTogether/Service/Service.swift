@@ -107,7 +107,7 @@ extension Service: TargetType {
             ]
         case .transcribeAudio(_):
             return [
-                "Authorization": "Bearer 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"
+                "Authorization": "Bearer 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"
             ]
         }
     }

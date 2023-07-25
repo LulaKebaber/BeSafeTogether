@@ -24,6 +24,7 @@ struct HomeView: View {
             
             Button(action: {
                 audioRecorder.stopRecording()
+                print(230)
             }) {
                 Text("Stop Recording")
             }
@@ -61,7 +62,6 @@ func requestMicrophoneAccess() {
         }
     }
 }
-
 
 struct MicButton: View {
     @ObservedObject var homeViewModel: HomeViewModel
@@ -231,10 +231,8 @@ class TranscriptionViewModel: ObservableObject {
             case let .success(response):
                 do {
                     let responseModel = try JSONDecoder().decode(TranscriptionResponse.self, from: response.data)
-                    // Instead of storing the result, directly update the property in the view model
                     DispatchQueue.main.async {
                         self.transcriptionResult = responseModel.transcription
-                        print("Transcription Result: \(responseModel.transcription)") // Print the transcribed result to the console
                     }
                 } catch {
                     print("Error decoding response: \(error)")
@@ -245,6 +243,7 @@ class TranscriptionViewModel: ObservableObject {
         }
     }
 }
+
 
 
 
