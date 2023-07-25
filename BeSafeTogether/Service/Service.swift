@@ -16,13 +16,13 @@ enum Service {
     case getWords
     case addContact(name: String, phone: String, gps: Bool)
     case getContacts
+    case transcribeAudio(file: Data)
 }
 
 extension Service: TargetType {
     var baseURL: URL {
-//        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
-        URL(string: "http://0.0.0.0:8000")! // на локалку
-        
+        //        URL(string: "http://0.0.0.0:8000")! // на локалку
+        URL(string: "https://api.openai.com/v1")! // whisper
     }
     
     var path: String {
@@ -37,12 +37,14 @@ extension Service: TargetType {
             return "/auth/users/words"
         case .addContact(_, _, _), .getContacts:
             return "/auth/users/contacts"
+        case .transcribeAudio:
+            return "/audio/transcriptions"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_), .addContact(_, _, _):
+        case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_), .addContact(_, _, _), .transcribeAudio(_):
             return .post
         case .getUserInfo, .getWords, .getContacts:
             return .get
@@ -84,6 +86,10 @@ extension Service: TargetType {
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
         case .getUserInfo, .getWords, .getContacts:
             return .requestPlain
+        case let .transcribeAudio(file):
+            let formData = MultipartFormData(provider: .data(file), name: "file", fileName: "audio_file.mp3", mimeType: "audio/mp3")
+            let data = [formData]
+            return .uploadMultipart(data)
         }
     }
     
@@ -98,6 +104,10 @@ extension Service: TargetType {
             return [
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded"
+            ]
+        case .transcribeAudio(_):
+            return [
+                "Authorization": "Bearer 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"
             ]
         }
     }

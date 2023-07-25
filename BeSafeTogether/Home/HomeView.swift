@@ -1,4 +1,5 @@
 import SwiftUI
+import Moya
 import AVFoundation
 
 enum MicButtonView {
@@ -7,8 +8,10 @@ enum MicButtonView {
 }
 
 struct HomeView: View {
-    @ObservedObject var homeViewModel = HomeViewModel()
     @State private var isRecording = false
+    @StateObject private var audioRecorder = AudioRecorder()
+    @StateObject private var transcriptionViewModel = TranscriptionViewModel()
+    @ObservedObject var homeViewModel = HomeViewModel()
     
     var body: some View {
         VStack {
@@ -18,33 +21,47 @@ struct HomeView: View {
             
             MicButton(homeViewModel: homeViewModel, isRecording: $isRecording)
                 .padding(.top, 60)
-            Button(action:{if let recordingPath = getFullRecordingPath() {
-                print("Recording Path: \(recordingPath.path)")
-            }}) {
-                Text("dwdw")
-            }
-            Spacer()
             
-//            ForEach(homeViewModel.recordedFiles, id: \.self) { fileURL in
-//                Text(fileURL.lastPathComponent)
-//            }
+            Button(action: {
+                audioRecorder.stopRecording()
+            }) {
+                Text("Stop Recording")
+            }
+            
+            Spacer()
             
             RequirementsList(homeViewModel: homeViewModel)
                 .padding(.bottom, 25)
         }
+        .onAppear {
+            requestMicrophoneAccess()
+            audioRecorder.transcriptionViewModel = transcriptionViewModel
+        }
     }
     
-    func getFullRecordingPath() -> URL? {
-        let fileManager = FileManager.default
-        guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
-            return nil
+}
+
+func getFullRecordingPath() -> URL? {
+    let fileManager = FileManager.default
+    guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+        return nil
+    }
+    
+    let recordingFileName = "recording.mp3" // Update the file name and extension if needed
+    
+    return documentsDirectory.appendingPathComponent(recordingFileName)
+}
+
+func requestMicrophoneAccess() {
+    AVAudioSession.sharedInstance().requestRecordPermission { granted in
+        if granted {
+            // Microphone access is granted, you can start recording
+        } else {
+            // Microphone access is not granted, handle this case (e.g., show an alert)
         }
-        
-        let recordingFileName = "recording.mp3" // Update the file name and extension if needed
-        
-        return documentsDirectory.appendingPathComponent(recordingFileName)
     }
 }
+
 
 struct MicButton: View {
     @ObservedObject var homeViewModel: HomeViewModel
@@ -52,16 +69,16 @@ struct MicButton: View {
     
     var body: some View {
         Button(action: {
-                    if self.homeViewModel.isRequirementsMet {
-                        self.isRecording.toggle()
-
-                        if self.isRecording {
-                            AudioRecorder.shared.startRecording()
-                        } else {
-                            AudioRecorder.shared.stopRecording()
-                        }
-                    }
-                }) {
+            if self.homeViewModel.isRequirementsMet {
+                self.isRecording.toggle()
+                
+                if self.isRecording {
+                    AudioRecorder.shared.startRecording()
+                } else {
+                    AudioRecorder.shared.stopRecording()
+                }
+            }
+        }) {
             ZStack {
                 Circle()
                     .foregroundColor(Color("gray 25"))
@@ -90,28 +107,29 @@ struct MicButton: View {
                 }
             }
             .onChange(of: isRecording) { newValue in
-                        if !newValue {
-                            // Stop recording when the button is clicked again
-                            AudioRecorder.shared.stopRecording()
-                        }
-                    }
+                if !newValue {
+                    // Stop recording when the button is clicked again
+                    AudioRecorder.shared.stopRecording()
+                }
+            }
         }
     }
 }
 
 class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
     static let shared = AudioRecorder()
-
+    
     private var audioRecorder: AVAudioRecorder?
     private let recordingDuration: TimeInterval = 10.0
     private var recordingIndex = 1 // Initialize recording index
-
+    
     @Published var recordedFiles: [URL] = []
-
-    private override init() {
+    var transcriptionViewModel: TranscriptionViewModel? // Add this property to hold the TranscriptionViewModel instance
+    
+    override init() {
         super.init()
     }
-
+    
     func startRecording() {
         let audioFilename = getDocumentsDirectory().appendingPathComponent("recording\(recordingIndex).wav")
         let settings = [
@@ -120,7 +138,7 @@ class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
             AVNumberOfChannelsKey: 2,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
         ] as [String: Any]
-
+        
         do {
             audioRecorder = try AVAudioRecorder(url: audioFilename, settings: settings)
             audioRecorder?.delegate = self
@@ -129,16 +147,17 @@ class AudioRecorder: NSObject, ObservableObject, AVAudioRecorderDelegate {
             print("Failed to start recording: \(error.localizedDescription)")
         }
     }
-
+    
     func stopRecording() {
         audioRecorder?.stop()
         guard let recordedURL = audioRecorder?.url else { return }
-        recordedFiles.append(recordedURL)
+        // Instead of adding to recordedFiles, we'll use the URL directly for transcription
+        if let audioData = try? Data(contentsOf: recordedURL) {
+            transcriptionViewModel?.transcribeAudio(file: audioData)
+        } // Use the transcriptionViewModel here
         audioRecorder = nil
-
-        recordingIndex += 1 // Increment the recording index
     }
-
+    
     private func getDocumentsDirectory() -> URL {
         FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
     }
@@ -200,4 +219,35 @@ struct HomeView_Previews: PreviewProvider {
     static var previews: some View {
         HomeView()
     }
+}
+
+class TranscriptionViewModel: ObservableObject {
+    let provider = MoyaProvider<Service>()
+    @Published var transcriptionResult: String?
+    
+    func transcribeAudio(file: Data) {
+        provider.request(.transcribeAudio(file: file)) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let responseModel = try JSONDecoder().decode(TranscriptionResponse.self, from: response.data)
+                    // Instead of storing the result, directly update the property in the view model
+                    DispatchQueue.main.async {
+                        self.transcriptionResult = responseModel.transcription
+                        print("Transcription Result: \(responseModel.transcription)") // Print the transcribed result to the console
+                    }
+                } catch {
+                    print("Error decoding response: \(error)")
+                }
+            case let .failure(error):
+                print("API request failed: \(error)")
+            }
+        }
+    }
+}
+
+
+
+struct TranscriptionResponse: Codable {
+    let transcription: String
 }
