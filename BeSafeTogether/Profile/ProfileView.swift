@@ -25,9 +25,12 @@ struct ProfileView: View {
                 ContactsButtonView()
                 Spacer()
             }
+            .onAppear {
+                getWords(homeViewModel: homeViewModel)
+            }
         }
     }
-    
+
     func addWord() {
         APIManager.shared.addWord(word: word) {
             getWords(homeViewModel: homeViewModel)

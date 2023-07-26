@@ -16,7 +16,9 @@ struct HomeView: View {
             Text("Welcome Home!")
                 .font(.title)
                 .padding(.top, 30)
-            
+            Button(action:{print(getFullRecordingPath())}) {
+                Text("dwdw")
+            }
             MicButton(homeViewModel: homeViewModel, isRecording: $isRecording)
                 .padding(.top, 60)
             Spacer()
@@ -35,6 +37,17 @@ struct HomeView: View {
         APIManager.shared.getWords { userWords in
             WordsAndContactsStorage.shared.words = .init(words: userWords)
         }
+    }
+    
+    func getFullRecordingPath() -> URL? {
+        let fileManager = FileManager.default
+        guard let documentsDirectory = fileManager.urls(for: .documentDirectory, in: .userDomainMask).first else {
+            return nil
+        }
+        
+        let recordingFileName = "recording.mp3" // Update the file name and extension if needed
+        
+        return documentsDirectory.appendingPathComponent(recordingFileName)
     }
 }
 
