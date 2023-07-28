@@ -16,11 +16,12 @@ enum Service {
     case getWords
     case addContact(name: String, phone: String, gps: Bool)
     case getContacts
+    case transcribe(audioFile: URL, model: String)
 }
 
 extension Service: TargetType {
     var baseURL: URL {
-//        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
+        //        URL(string: "https://besafetogether.up.railway.app")! // на внешку railway
         URL(string: "http://localhost:8000")! // на локалку
     }
     
@@ -36,12 +37,14 @@ extension Service: TargetType {
             return "/auth/users/words"
         case .addContact(_, _, _), .getContacts:
             return "/auth/users/contacts"
+        case .transcribe:
+            return "/auth/users/transcriptions"
         }
     }
     
     var method: Moya.Method {
         switch self {
-        case .registerNewUser(_, _, _, _), .loginUser(_, _), .addWord(_), .addContact(_, _, _):
+        case .registerNewUser, .loginUser, .addWord, .addContact, .transcribe:
             return .post
         case .getUserInfo, .getWords, .getContacts:
             return .get
@@ -81,6 +84,9 @@ extension Service: TargetType {
                 "gps": gps
             ]
             return .requestParameters(parameters: parameters, encoding: JSONEncoding.default)
+        case .transcribe(let file, _):
+            let multiPartData = MultipartFormData(provider: .file(file), name: "file")
+            return .uploadMultipart([multiPartData])
         case .getUserInfo, .getWords, .getContacts:
             return .requestPlain
         }
@@ -88,16 +94,18 @@ extension Service: TargetType {
     
     var headers: [String : String]? {
         switch self {
-        case .registerNewUser(_, _, _, _), .getUserInfo, .addWord, .addContact(_, _, _):
+        case .registerNewUser, .getUserInfo, .addWord, .addContact:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/json"
             ]
-        case .loginUser(_, _), .getWords, .getContacts:
+        case .loginUser, .getWords, .getContacts:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded"
             ]
+        case .transcribe:
+            return ["Content-type": "multipart/form-data"]
         }
     }
 }

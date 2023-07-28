@@ -39,3 +39,7 @@ struct UserContact: Decodable {
 struct UserContacts: Decodable {
     let contacts: [UserContact]
 } // get user contacts
+
+struct TranscribeResponse: Decodable {
+    let text: String
+}

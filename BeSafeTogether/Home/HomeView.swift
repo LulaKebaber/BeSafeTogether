@@ -1,4 +1,5 @@
 import SwiftUI
+import Moya
 import AVFoundation
 
 enum MicButtonView {
@@ -111,17 +112,14 @@ struct MicButton: View {
     }
 
     func startRecording() {
-        let filename = getDocumentsDirectory().appendingPathComponent("recording\(self.recordCount).wav")
+        let filename = getDocumentsDirectory().appendingPathComponent("recording\(self.recordCount).m4a")
 
-        let settings = [
-            AVFormatIDKey: Int(kAudioFormatLinearPCM),
-            AVSampleRateKey: 44100,
-            AVNumberOfChannelsKey: 2,
-            AVLinearPCMBitDepthKey: 16,
-            AVLinearPCMIsBigEndianKey: false,
-            AVLinearPCMIsFloatKey: false,
+        let settings: [String: Any] = [
+            AVFormatIDKey: Int(kAudioFormatMPEG4AAC),
+            AVSampleRateKey: 12000.0,
+            AVNumberOfChannelsKey: 1,
             AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
-        ] as [String : Any]
+        ]
 
         do {
             audioRecorder = try AVAudioRecorder(url: filename, settings: settings)
@@ -137,6 +135,8 @@ struct MicButton: View {
             audioRecorder.stop()
             audioRecorder = nil
             print("Stopped recording")
+            let audioFileURL = getDocumentsDirectory().appendingPathComponent("recording\(self.recordCount).m4a")
+            APIManager.shared.sendTranscriptionRequest(audioFileURL: audioFileURL)
         } else {
             print("Tried to stop recording, but audioRecorder was nil.")
         }
@@ -147,7 +147,6 @@ struct MicButton: View {
         return paths[0]
     }
 }
-
 
 struct RequirementsList: View {
     @ObservedObject var homeViewModel: HomeViewModel

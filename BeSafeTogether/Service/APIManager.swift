@@ -66,6 +66,25 @@ struct APIManager {
         }
     }
     
+    func sendTranscriptionRequest(audioFileURL: URL) {
+        let provider = self.bearerProvider
+        provider.request(.transcribe(audioFile: audioFileURL, model: "whisper-1")) { result in
+            switch result {
+            case .success(let response):
+                do {
+                    let jsonResponse = try response.mapJSON()
+                    print(jsonResponse)
+                    print(response)
+                } catch {
+                    print("Failed to map response to JSON: \(error)")
+                }
+            case .failure(let error):
+                print("Request failed: \(error)")
+            }
+        }
+    }
+
+    
 //    func getUserInfo() {
 //
 //        let provider = self.bearerProvider
