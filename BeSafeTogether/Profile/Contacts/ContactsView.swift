@@ -12,28 +12,23 @@ import KeychainAccess
 
 struct ContactsView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-    let keychain = Keychain(service: "com.BeSafeTogether.service")
-    let provider = APIManager.shared.provider
-    @State var isAddingContact = false
+    @StateObject  var contactsViewModel = ContactsViewModel() // Create the ContactsViewModel instance
     
+    @State var isAddingContact = false
     @State var firstName = ""
     @State var lastName = ""
     @State var phoneNumber = ""
     @State var gps = false
     @State var isLoad = false
     
-    @State var contacts: [(String, String, Bool)] = []
-    
     var body: some View {
-        
         VStack {
             Text("My Contacts")
                 .font(Font(UIFont.bold_32))
-            
-            ContactsListView(contacts: $contacts)
+            list
             Spacer()
             HStack {
-                Text("Your default message:")
+                Text("Your default message:") 
                     .font(Font(UIFont.regular_18))
                 Spacer()
                 Image(systemName: "info.circle")
@@ -45,62 +40,45 @@ struct ContactsView: View {
                 .padding(.bottom, 25)
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: addContact))
+        .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: {
+            contactsViewModel.addContact(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, gps: gps)
+        })
+        )
         .onAppear {
-            getContacts()
-        }
-        
-    }
-    
-    func addContact() {
-        APIManager.shared.addContact(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, gps: gps) {
-            getContacts()
+            contactsViewModel.getContacts()
         }
     }
     
-    func getContacts() {
-        APIManager.shared.getContacts { userContacts in
-            DispatchQueue.main.async { // Ensure UI updates are done on the main thread
-                self.contacts = userContacts.map { ($0.name, $0.phone, $0.gps) }
-            }
-            WordsAndContactsStorage.shared.contacts = .init(contacts: userContacts)
-        }
-    }
-}
-
-struct ContactsListView: View {
-    @Binding var contacts: [(String, String, Bool)]
-    
-    var body: some View {
-        ScrollView {
-            VStack {
-                ForEach(contacts.indices, id: \.self) { index in
-                    ContactView(
-                        ContactName: contacts[index].0,
-                        ContactPhoneNumber: contacts[index].1,
-                        gps: contacts[index].2
-                    )
-                    .padding(.bottom, 10) // Add spacing between contacts
+    var list: some View {
+        List(contactsViewModel.contacts) { contact in
+            ContactView(contactName: contact.name, contactPhoneNumber: contact.phone, gps: contact.gps)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    HStack{
+                        Button(action: {
+                            contactsViewModel.deleteContacts(contactId: contact.id)
+                        }, label: {
+                            Label("Удалить", systemImage: "trash")
+                        })
+                        .tint(.red)
+                    }
                 }
-            }
-            .padding()
         }
-        .frame(height: 280)
+        .listStyle(.plain)
+        .background(.white)
     }
 }
 
 struct ContactView: View {
-    
-    @State var ContactName: String
-    @State var ContactPhoneNumber: String
+    @State var contactName: String
+    @State var contactPhoneNumber: String
     @State var gps: Bool
     
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
-                Text(ContactName)
+                Text(contactName)
                     .font(Font(UIFont.semibold_18))
-                Text(ContactPhoneNumber)
+                Text(contactPhoneNumber)
                     .font(Font(UIFont.regular_16))
             } // VStack
             .padding()
@@ -118,7 +96,6 @@ struct ContactView: View {
                 } // ZStack
                 .padding()
             }
-            
         } // HStack
         .padding([.leading, .trailing], 17)
         .background(RoundedRectangle(cornerRadius: 10)
@@ -166,7 +143,7 @@ struct AddContactButtonView: View {
     @Binding var lastName: String
     @Binding var phoneNumber: String
     @Binding var gps: Bool
-    var addContactAction: () -> Void // New closure for addContact action
+    var addContactAction: () -> Void // Closure without arguments
     
     var body: some View {
         Button(action: {
@@ -181,6 +158,8 @@ struct AddContactButtonView: View {
         }
     }
 }
+
+
 
 struct NewContactView: View {
     @Environment(\.presentationMode) var presentationMode

@@ -9,13 +9,11 @@ import SwiftUI
 import Moya
 import KeychainAccess
 
-
 struct LoginView: View {
     @State private var username = ""
     @State private var password = ""
     @State var isActive = false
     let keychain = Keychain(service: "com.BeSafeTogether.service")
-    let defaults = UserDefaults.standard
     
     var body: some View {
         VStack() {

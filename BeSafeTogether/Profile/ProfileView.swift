@@ -13,38 +13,23 @@ import AVFoundation
 struct ProfileView: View {
     @State var word: String = ""
     @State var words: [(String, String)] = []
-    @ObservedObject var homeViewModel = HomeViewModel()
-    let keychain = Keychain(service: "com.BeSafeTogether.service")
-    let provider = APIManager.shared.provider
+    @StateObject  var profileViewModel = ProfileViewModel()
     
     var body: some View {
         NavigationView {
             VStack {
                 ProfileInfoView()
-                StopWordsView(word: $word, words: $words, addWordAction: addWord)
+                StopWordsView(word: $word, words: $words, addWordAction: {
+                    profileViewModel.addWord(word: word)
+                })
                 ContactsButtonView()
                 Spacer()
             }
             .onAppear {
-                getWords(homeViewModel: homeViewModel)
+                profileViewModel.getWords()
             }
         }
     }
-
-    func addWord() {
-        APIManager.shared.addWord(word: word) {
-            getWords(homeViewModel: homeViewModel)
-        }
-    }
-    
-    func getWords(homeViewModel: HomeViewModel) {
-            APIManager.shared.getWords { userWords in
-                DispatchQueue.main.async {
-                    self.words = userWords.map { ($0.word, $0.timestamp) }
-                }
-                WordsAndContactsStorage.shared.words = .init(words: userWords)
-            }
-        }
 }
 
 struct ProfileInfoView: View {
@@ -84,6 +69,7 @@ struct ProfileInfoView: View {
 struct StopWordsView: View {
     @Binding var word: String
     @Binding var words: [(String, String)]
+    @StateObject  var profileViewModel = ProfileViewModel()
     var addWordAction: () -> Void
     
     var body: some View {
@@ -92,17 +78,7 @@ struct StopWordsView: View {
                 .font(Font(UIFont.bold_26))
                 .padding(.top, 20)
                 .fixedSize(horizontal: false, vertical: true)
-            
-            ScrollView {
-                VStack {
-                    ForEach(words.indices, id: \.self) { index in
-                        WordView(word: words[index].0, date: words[index].1)
-                            .padding(.horizontal, 10)
-                    }
-                }
-                .padding(.bottom, 20)
-            }
-            
+            list
             AddWordView(word: $word, addWordAction: addWordAction)
                 .padding(.horizontal, 10) // Add horizontal padding
         }
@@ -113,6 +89,28 @@ struct StopWordsView: View {
                 .shadow(color: Color.gray.opacity(0.5), radius: 3, x: 0, y: 2)
         )
         .frame(width: 360, height: 380)
+        .onAppear {
+            profileViewModel.getWords()
+        }
+    }
+
+    
+    var list: some View {
+        List(profileViewModel.words) { word in
+            WordView(word: word.word, date: word.timestamp)
+                .swipeActions(edge: .trailing, allowsFullSwipe: true) {
+                    HStack{
+                        Button(action: {
+                            profileViewModel.deleteWord(wordId: word.id)
+                        }, label: {
+                            Label("Удалить", systemImage: "trash")
+                        })
+                        .tint(.red)
+                    }
+                }
+        }
+        .listStyle(.plain)
+        .background(.white)
     }
 }
 

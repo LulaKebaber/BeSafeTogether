@@ -53,6 +53,7 @@ struct APIManager {
             switch result {
             case let .success(response):
                 do {
+                    print(response)
                     let userToken = try response.map(UserToken.self)
                     self.keychain["BearerToken"] = userToken.access_token
                 } catch {
@@ -74,7 +75,7 @@ struct APIManager {
                 do {
                     let jsonResponse = try response.mapJSON()
                     print(jsonResponse)
-                    print(response)
+//                    print(response)
                 } catch {
                     print("Failed to map response to JSON: \(error)")
                 }
@@ -124,7 +125,8 @@ struct APIManager {
             case let .success(response):
                 do {
                     let userWords = try response.map(UserWords.self).words
-                    completion(userWords) 
+                    print(response)
+                    completion(userWords)
                 } catch {
                     print("Failed to parse users: \(error)")
                 }
@@ -133,7 +135,6 @@ struct APIManager {
             }
         }
     }
-
     
     func addContact(firstName: String, lastName: String, phoneNumber: String, gps: Bool, completion: @escaping () -> Void) {
         let provider = self.bearerProvider
@@ -156,6 +157,7 @@ struct APIManager {
             switch result {
             case let .success(response):
                 do {
+                    print(response)
                     let userContacts = try response.map(UserContacts.self).contacts
                     completion(userContacts)
                 } catch {
@@ -163,6 +165,32 @@ struct APIManager {
                 }
             case let .failure(error):
                 print("API request failed: \(error)")
+            }
+        }
+    }
+    
+    func deleteContact(contactId: String, completion: @escaping () -> Void) {
+        let provider = self.bearerProvider
+
+        provider.request(.deleteContact(contactId: contactId)) { result in
+            switch result {
+            case .success:
+                completion()
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func deleteWord(wordId: String, completion: @escaping () -> Void) {
+        let provider = self.bearerProvider
+
+        provider.request(.deleteWord(wordId: wordId)) { result in
+            switch result {
+            case .success:
+                completion()
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
             }
         }
     }

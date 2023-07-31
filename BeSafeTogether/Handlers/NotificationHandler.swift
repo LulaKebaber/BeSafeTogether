@@ -28,7 +28,7 @@ class NotificationHandler {
         content.body = "MY BODY"
         content.sound = UNNotificationSound.default
         
-        let request = UNNotificationRequest(identifier: UUID(), content: content, trigger: trigger)
+        let request = UNNotificationRequest(identifier: UUID().uuidString, content: content, trigger: trigger)
         
         UNUserNotificationCenter.current().add(request)
     }

@@ -11,12 +11,13 @@ import Foundation
 enum Service {
     case registerNewUser(username: String, name: String, phone: String, password: String)
     case loginUser(username: String, password: String)
-    case getUserInfo
     case addWord(word: String)
     case getWords
     case addContact(name: String, phone: String, gps: Bool)
     case getContacts
     case transcribe(audioFile: URL, model: String)
+    case deleteContact(contactId: String)
+    case deleteWord(wordId: String)
 }
 
 extension Service: TargetType {
@@ -27,18 +28,20 @@ extension Service: TargetType {
     
     var path: String {
         switch self {
-        case .registerNewUser(_, _, _, _):
+        case .registerNewUser:
             return "/auth/users"
-        case .loginUser(_, _):
+        case .loginUser:
             return "/auth/users/tokens"
-        case .getUserInfo:
-            return "/auth/users/me"
-        case .addWord(_), .getWords:
+        case .addWord, .getWords:
             return "/auth/users/words"
-        case .addContact(_, _, _), .getContacts:
+        case .addContact, .getContacts:
             return "/auth/users/contacts"
         case .transcribe:
             return "/auth/users/transcriptions"
+        case .deleteContact(let contactId):
+            return "/auth/users/contacts/\(contactId)"
+        case .deleteWord(let wordId):
+            return "/auth/users/words/\(wordId)"
         }
     }
     
@@ -46,8 +49,10 @@ extension Service: TargetType {
         switch self {
         case .registerNewUser, .loginUser, .addWord, .addContact, .transcribe:
             return .post
-        case .getUserInfo, .getWords, .getContacts:
+        case .getWords, .getContacts:
             return .get
+        case .deleteContact, .deleteWord:
+            return .delete
         }
     }
     
@@ -87,19 +92,19 @@ extension Service: TargetType {
         case .transcribe(let file, _):
             let multiPartData = MultipartFormData(provider: .file(file), name: "file")
             return .uploadMultipart([multiPartData])
-        case .getUserInfo, .getWords, .getContacts:
+        case .getContacts, .getWords, .deleteContact, .deleteWord:
             return .requestPlain
         }
     }
     
     var headers: [String : String]? {
         switch self {
-        case .registerNewUser, .getUserInfo, .addWord, .addContact:
+        case .registerNewUser, .addWord, .addContact, .getContacts, .getWords, .deleteContact, .deleteWord:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/json"
             ]
-        case .loginUser, .getWords, .getContacts:
+        case .loginUser:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/x-www-form-urlencoded"
