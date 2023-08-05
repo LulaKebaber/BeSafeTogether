@@ -10,26 +10,40 @@ enum MicButtonView {
 struct HomeView: View {
     @ObservedObject var homeViewModel = HomeViewModel()
     @ObservedObject var wordsAndContactsStorage = WordsAndContactsStorage()
-    
-    let notify = NotificationHandler()
-    
+        
     var body: some View {
         VStack {
             Text("Welcome Home!")
                 .font(.title)
                 .padding(.top, 30)
-            Button("request") {
-                notify.askPermission()
-            }
-            Button("send") {
-                notify.sendNotification()
-            }
             MicButton(homeViewModel: homeViewModel)
                 .padding(.top, 60)
             Spacer()
             RequirementsList(homeViewModel: homeViewModel)
                 .padding(.bottom, 25)
         }
+        .onAppear {
+            startCheckingThreats()
+        }
+    }
+    
+    func startCheckingThreats() {
+        // Run the initial check immediately
+        APIManager.shared.checkForThreat { _ in
+            ()
+        }
+ 
+        // Schedule repeating task
+        homeViewModel.threatTimer = Timer.scheduledTimer(withTimeInterval: 5, repeats: true) { _ in
+            APIManager.shared.checkForThreat { _ in
+                ()
+            }
+        }
+    }
+    
+    func stopCheckingThreats() {
+        homeViewModel.threatTimer?.invalidate()
+        homeViewModel.threatTimer = nil
     }
 }
 

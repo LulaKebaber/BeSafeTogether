@@ -6,8 +6,11 @@
 // test
 
 import SwiftUI
+import KeychainAccess
 
 struct GetStartedView: View {
+    
+    let keychain = Keychain(service: "com.BeSafeTogether.service")
     
     var body: some View {
         NavigationView {
@@ -20,6 +23,9 @@ struct GetStartedView: View {
                 .onAppear {
                     print(232323)
                 }
+        }
+        .onAppear {
+            self.keychain["BearerToken"] = ""
         }
     }
 }

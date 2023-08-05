@@ -13,7 +13,7 @@ import AVFoundation
 struct ProfileView: View {
     @State var word: String = ""
     @State var words: [(String, String)] = []
-    @StateObject  var profileViewModel = ProfileViewModel()
+    @StateObject var profileViewModel = ProfileViewModel()
     
     var body: some View {
         NavigationView {
@@ -24,9 +24,6 @@ struct ProfileView: View {
                 })
                 ContactsButtonView()
                 Spacer()
-            }
-            .onAppear {
-                profileViewModel.getWords()
             }
         }
     }
@@ -40,7 +37,6 @@ struct ProfileInfoView: View {
                 .frame(width: 360.0, height: 110)
                 .cornerRadius(20)
                 .padding(10)
-            
             HStack {
                 ZStack{
                     Image(systemName: "person.crop.circle.fill")
@@ -48,7 +44,6 @@ struct ProfileInfoView: View {
                         .frame(width: 70, height: 70)
                         .foregroundColor(Color.white)
                 }
-                
                 Text("Username")
                     .font(Font(UIFont.medium_22))
                     .foregroundColor(Color.white)
@@ -58,7 +53,6 @@ struct ProfileInfoView: View {
                     .resizable()
                     .frame(width: 30.0, height: 30)
                     .foregroundColor(Color.white)
-                
             }
             .padding(.leading, 36)
             .padding(.trailing, 45)
@@ -69,7 +63,7 @@ struct ProfileInfoView: View {
 struct StopWordsView: View {
     @Binding var word: String
     @Binding var words: [(String, String)]
-    @StateObject  var profileViewModel = ProfileViewModel()
+    @StateObject var profileViewModel = ProfileViewModel()
     var addWordAction: () -> Void
     
     var body: some View {
@@ -78,22 +72,21 @@ struct StopWordsView: View {
                 .font(Font(UIFont.bold_26))
                 .padding(.top, 20)
                 .fixedSize(horizontal: false, vertical: true)
+                .frame(width: 360, height: 35)
             list
             AddWordView(word: $word, addWordAction: addWordAction)
-                .padding(.horizontal, 10) // Add horizontal padding
         }
         .background(
             RoundedRectangle(cornerRadius: 10)
                 .fill(Color.white)
-                .frame(width: 360, height: 380)
+                .frame(width: 360, height: 385)
                 .shadow(color: Color.gray.opacity(0.5), radius: 3, x: 0, y: 2)
         )
-        .frame(width: 360, height: 380)
+        .frame(width: 360, height: 385)
         .onAppear {
             profileViewModel.getWords()
         }
     }
-
     
     var list: some View {
         List(profileViewModel.words) { word in
@@ -116,20 +109,16 @@ struct StopWordsView: View {
 
 struct WordView: View {
     var word : String
-    var date = "15 oct, 2022 - 10:23"
+    var date = ""
     var body: some View {
         HStack {
             VStack(alignment: .leading) {
                 Text(word)
                     .font(Font(UIFont.semibold_18))
-                    .padding(.bottom, 0.01)
                 Text(date)
                     .font(Font(UIFont.regular_14))
             }
             Spacer()
-            Image(systemName: "trash.fill")
-                .resizable()
-                .frame(width: 22, height: 25)
         }
         .padding()
         .background(RoundedRectangle(cornerRadius: 10)
@@ -142,6 +131,7 @@ struct WordView: View {
 
 struct AddWordView: View {
     @Binding var word: String
+    @StateObject var profileViewModel = ProfileViewModel()
     var addWordAction: () -> Void
     
     var body: some View {
@@ -160,6 +150,9 @@ struct AddWordView: View {
                 }
             }
             .padding(.trailing, 20)
+        }
+        .onAppear {
+            profileViewModel.getWords()
         }
     }
 }

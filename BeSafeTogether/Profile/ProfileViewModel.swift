@@ -21,6 +21,7 @@ class ProfileViewModel: ObservableObject {
     func getWords() {
         apiManager.getWords { [weak self] userWords in
             self?.words = userWords
+            print(userWords)
             WordsAndContactsStorage.shared.words = .init(words: userWords)
         }
     }

@@ -6,3 +6,9 @@
 //
 
 import Foundation
+
+class MapViewModel: ObservableObject {
+    var timer: Timer? = nil
+    let interval: TimeInterval = 5.0
+    
+}

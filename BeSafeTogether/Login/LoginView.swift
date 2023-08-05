@@ -39,12 +39,13 @@ struct LoginView: View {
     
     func loginUser() {
         APIManager.shared.loginUser(username: username, password: password) {
-            APIManager.shared.getWords { words in
-                WordsAndContactsStorage.shared.words = .init(words: words)
-            }
-            APIManager.shared.getContacts { contacts in
-                WordsAndContactsStorage.shared.contacts = .init(contacts: contacts)
-            }
+            ()
+//            APIManager.shared.getWords { words in
+//                WordsAndContactsStorage.shared.words = .init(words: words)
+//            }
+//            APIManager.shared.getContacts { contacts in
+//                WordsAndContactsStorage.shared.contacts = .init(contacts: contacts)
+//            }
         }
     }
 }
@@ -118,7 +119,7 @@ struct SignInButtonView: View {
                 RoundedRectangle(cornerRadius: 30)
                     .foregroundColor(Color.black)
                     .frame(width: 330, height: 55)
-                Text("Sign Up")
+                Text("Sign In")
                     .foregroundColor(Color.white)
                     .font(Font(UIFont.medium_18))
             }

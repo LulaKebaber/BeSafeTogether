@@ -10,15 +10,15 @@ import Foundation
 import AVFAudio
 
 class HomeViewModel: ObservableObject {
-    
     @Published var isGpsEnabled = true
-    //    @Published var isContactsSet = true
-    //    @Published var isStopWordsSet = true
     
     @Published var isRecording = false
     var audioRecorder: AVAudioRecorder?
     var recordCount = 0
     var timer: Timer? = nil
+    
+    let interval: TimeInterval = 5.0
+    var threatTimer: Timer? = nil
     
     var isContactsSet: Bool {
         guard let userWords = WordsAndContactsStorage.shared.contacts else { return false }

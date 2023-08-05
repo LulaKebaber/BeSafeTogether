@@ -8,11 +8,14 @@
 import Foundation
 import Moya
 import KeychainAccess
+import MapKit
 
 struct APIManager {
     static let shared = APIManager()
     
     let keychain = Keychain(service: "com.BeSafeTogether.service")
+    
+    let provider = MoyaProvider<Service>()
     
     var bearerProvider: MoyaProvider<Service> {
         // Retrieve the bearer token from Keychain
@@ -30,8 +33,6 @@ struct APIManager {
         // Create a MoyaProvider instance with the custom endpoint closure
         return MoyaProvider<Service>(endpointClosure: endpointClosure)
     }
-    
-    let provider = MoyaProvider<Service>()
     
     func registerNewUser(username: String, name: String, phone: String, password: String) {
         let provider = self.provider
@@ -55,6 +56,7 @@ struct APIManager {
                 do {
                     print(response)
                     let userToken = try response.map(UserToken.self)
+                    print(userToken)
                     self.keychain["BearerToken"] = userToken.access_token
                 } catch {
                     print("Failed to parse UserToken: \(error)")
@@ -74,8 +76,6 @@ struct APIManager {
             case .success(let response):
                 do {
                     let jsonResponse = try response.mapJSON()
-                    print(jsonResponse)
-//                    print(response)
                 } catch {
                     print("Failed to map response to JSON: \(error)")
                 }
@@ -84,25 +84,25 @@ struct APIManager {
             }
         }
     }
-
     
-//    func getUserInfo() {
-//
-//        let provider = self.bearerProvider
-//        
-//        provider.request(.getUserInfo) { result in
-//            switch result {
-//            case let .success(response):
-//                do {
-//                    let users = try response.map(UserData.self)
-//                } catch {
-//                    print("Failed to parse users: \(error)")
-//                }
-//            case let .failure(error):
-//                print("API request failed: \(error)")
-//            }
-//        }
-//    }
+    
+    //    func getUserInfo() {
+    //
+    //        let provider = self.bearerProvider
+    //        
+    //        provider.request(.getUserInfo) { result in
+    //            switch result {
+    //            case let .success(response):
+    //                do {
+    //                    let users = try response.map(UserData.self)
+    //                } catch {
+    //                    print("Failed to parse users: \(error)")
+    //                }
+    //            case let .failure(error):
+    //                print("API request failed: \(error)")
+    //            }
+    //        }
+    //    }
     
     func addWord(word: String, completion: @escaping () -> Void) {
         let provider = self.bearerProvider
@@ -125,7 +125,8 @@ struct APIManager {
             case let .success(response):
                 do {
                     let userWords = try response.map(UserWords.self).words
-                    print(response)
+                    print(userWords)
+                    print(response.statusCode)
                     completion(userWords)
                 } catch {
                     print("Failed to parse users: \(error)")
@@ -136,11 +137,10 @@ struct APIManager {
         }
     }
     
-    func addContact(firstName: String, lastName: String, phoneNumber: String, gps: Bool, completion: @escaping () -> Void) {
+    func addContact(username: String, completion: @escaping () -> Void) {
         let provider = self.bearerProvider
-        let name = firstName + " " + lastName
         
-        provider.request(.addContact(name: name, phone: phoneNumber, gps: gps)) { result in
+        provider.request(.addContact(username: username)) { result in
             switch result {
             case .success:
                 completion()
@@ -157,8 +157,9 @@ struct APIManager {
             switch result {
             case let .success(response):
                 do {
-                    print(response)
+                    print("00000000000000000000000000000000000000000000000000000000000000000")
                     let userContacts = try response.map(UserContacts.self).contacts
+                    print(userContacts)
                     completion(userContacts)
                 } catch {
                     print("Failed to parse users: \(error)")
@@ -171,7 +172,7 @@ struct APIManager {
     
     func deleteContact(contactId: String, completion: @escaping () -> Void) {
         let provider = self.bearerProvider
-
+        
         provider.request(.deleteContact(contactId: contactId)) { result in
             switch result {
             case .success:
@@ -184,11 +185,53 @@ struct APIManager {
     
     func deleteWord(wordId: String, completion: @escaping () -> Void) {
         let provider = self.bearerProvider
-
+        
         provider.request(.deleteWord(wordId: wordId)) { result in
             switch result {
             case .success:
                 completion()
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func checkForThreat(completion: @escaping ([MapAnnotationItem]) -> Void) {
+        let provider = self.bearerProvider
+        
+        provider.request(.checkForThreat) { result in
+            switch result {
+            case let .success(response):
+                do {
+
+                    let threats = try response.map(Threats.self).threats
+
+                    // Create MapAnnotationItem for each threat
+                    var threatLocations: [MapAnnotationItem] = []
+                    for threat in threats {
+                        let coordinate = CLLocationCoordinate2D(latitude: CLLocationDegrees(threat.latitude), longitude: CLLocationDegrees(threat.longitude))
+                        let annotation = MapAnnotationItem(coordinate: coordinate, title: threat.username)
+                        threatLocations.append(annotation)
+                    }
+                    
+                    completion(threatLocations)
+                    
+                } catch let error {
+                    print("Mapping error: \(error.localizedDescription)")
+                }
+            case let .failure(error):
+                print("Error: \(error.localizedDescription)")
+            }
+        }
+    }
+    
+    func updateLocation(latitude: Float, longitude: Float) {
+        let provider = self.bearerProvider
+        
+        provider.request(.updateLocation(latitude: latitude, longitude: longitude)) { result in
+            switch result {
+            case .success:
+                print(result)
             case let .failure(error):
                 print("Error: \(error.localizedDescription)")
             }

@@ -24,9 +24,11 @@
 		25FF34EC2A43217B00398411 /* MapView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34EB2A43217B00398411 /* MapView.swift */; };
 		25FF34EE2A43226100398411 /* HomeView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34ED2A43226100398411 /* HomeView.swift */; };
 		25FF34F02A43227400398411 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 25FF34EF2A43227400398411 /* ProfileView.swift */; };
+		D20D9A612A7E7466005327E3 /* SimpleToast in Frameworks */ = {isa = PBXBuildFile; productRef = D20D9A602A7E7466005327E3 /* SimpleToast */; };
+		D20D9A632A7E77EC005327E3 /* MapViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D20D9A622A7E77EC005327E3 /* MapViewModel.swift */; };
 		D25D624C2A780EF600F89ED4 /* ProfileViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D25D624B2A780EF600F89ED4 /* ProfileViewModel.swift */; };
+		D25D624F2A78800D00F89ED4 /* SocketIO in Frameworks */ = {isa = PBXBuildFile; productRef = D25D624E2A78800D00F89ED4 /* SocketIO */; };
 		D2769D832A6DCB13009DE21C /* APIManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2769D822A6DCB13009DE21C /* APIManager.swift */; };
-		D2A165342A743444005465B2 /* NotificationHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A165332A743444005465B2 /* NotificationHandler.swift */; };
 		D2A442A02A754BA20051C06D /* LoginViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A4429F2A754BA20051C06D /* LoginViewModel.swift */; };
 		D2A442A22A75BD250051C06D /* ContactsViewModel.swift in Sources */ = {isa = PBXBuildFile; fileRef = D2A442A12A75BD250051C06D /* ContactsViewModel.swift */; };
 /* End PBXBuildFile section */
@@ -49,9 +51,9 @@
 		25FF34EB2A43217B00398411 /* MapView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapView.swift; sourceTree = "<group>"; };
 		25FF34ED2A43226100398411 /* HomeView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HomeView.swift; sourceTree = "<group>"; };
 		25FF34EF2A43227400398411 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
+		D20D9A622A7E77EC005327E3 /* MapViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MapViewModel.swift; sourceTree = "<group>"; };
 		D25D624B2A780EF600F89ED4 /* ProfileViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileViewModel.swift; sourceTree = "<group>"; };
 		D2769D822A6DCB13009DE21C /* APIManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = APIManager.swift; sourceTree = "<group>"; };
-		D2A165332A743444005465B2 /* NotificationHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NotificationHandler.swift; sourceTree = "<group>"; };
 		D2A4429F2A754BA20051C06D /* LoginViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginViewModel.swift; sourceTree = "<group>"; };
 		D2A442A12A75BD250051C06D /* ContactsViewModel.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ContactsViewModel.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -61,8 +63,10 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				D20D9A612A7E7466005327E3 /* SimpleToast in Frameworks */,
 				2545A2472A53F3A700E36D13 /* KeychainAccess in Frameworks */,
 				251BA1BC2A4C60B500BF7223 /* Moya in Frameworks */,
+				D25D624F2A78800D00F89ED4 /* SocketIO in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -109,6 +113,7 @@
 			isa = PBXGroup;
 			children = (
 				25FF34EB2A43217B00398411 /* MapView.swift */,
+				D20D9A622A7E77EC005327E3 /* MapViewModel.swift */,
 			);
 			path = Map;
 			sourceTree = "<group>";
@@ -151,7 +156,6 @@
 		25FF34D82A42BAC100398411 /* BeSafeTogether */ = {
 			isa = PBXGroup;
 			children = (
-				D2A165322A743420005465B2 /* Handlers */,
 				2545A2482A5405C900E36D13 /* GetStartedView.swift */,
 				251BA1C52A4C846500BF7223 /* Login */,
 				251BA1C22A4C82BF00BF7223 /* Registration */,
@@ -177,14 +181,6 @@
 			path = "Preview Content";
 			sourceTree = "<group>";
 		};
-		D2A165322A743420005465B2 /* Handlers */ = {
-			isa = PBXGroup;
-			children = (
-				D2A165332A743444005465B2 /* NotificationHandler.swift */,
-			);
-			path = Handlers;
-			sourceTree = "<group>";
-		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -204,6 +200,8 @@
 			packageProductDependencies = (
 				251BA1BB2A4C60B500BF7223 /* Moya */,
 				2545A2462A53F3A700E36D13 /* KeychainAccess */,
+				D25D624E2A78800D00F89ED4 /* SocketIO */,
+				D20D9A602A7E7466005327E3 /* SimpleToast */,
 			);
 			productName = BeSafeTogether;
 			productReference = 25FF34D62A42BAC100398411 /* BeSafeTogether.app */;
@@ -236,6 +234,8 @@
 			packageReferences = (
 				251BA1BA2A4C60B400BF7223 /* XCRemoteSwiftPackageReference "Moya" */,
 				2545A2452A53F3A700E36D13 /* XCRemoteSwiftPackageReference "KeychainAccess" */,
+				D25D624D2A78800D00F89ED4 /* XCRemoteSwiftPackageReference "socket" */,
+				D20D9A5F2A7E7466005327E3 /* XCRemoteSwiftPackageReference "SimpleToast" */,
 			);
 			productRefGroup = 25FF34D72A42BAC100398411 /* Products */;
 			projectDirPath = "";
@@ -271,7 +271,6 @@
 				25E684C82A4352F7001E6571 /* HomeViewModel.swift in Sources */,
 				25FF34F02A43227400398411 /* ProfileView.swift in Sources */,
 				D2769D832A6DCB13009DE21C /* APIManager.swift in Sources */,
-				D2A165342A743444005465B2 /* NotificationHandler.swift in Sources */,
 				251BA1C82A4C848100BF7223 /* LoginView.swift in Sources */,
 				251BA1BE2A4C60D600BF7223 /* Service.swift in Sources */,
 				25FF34EC2A43217B00398411 /* MapView.swift in Sources */,
@@ -281,6 +280,7 @@
 				2545A2492A5405C900E36D13 /* GetStartedView.swift in Sources */,
 				251BA1C12A4C616100BF7223 /* Mapper.swift in Sources */,
 				25E684C62A435111001E6571 /* Helper.swift in Sources */,
+				D20D9A632A7E77EC005327E3 /* MapViewModel.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -419,6 +419,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -451,6 +452,7 @@
 				INFOPLIST_KEY_UILaunchScreen_Generation = YES;
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
 				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPhone = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UIUserInterfaceStyle = Light;
 				IPHONEOS_DEPLOYMENT_TARGET = 16.1;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -505,6 +507,22 @@
 				kind = branch;
 			};
 		};
+		D20D9A5F2A7E7466005327E3 /* XCRemoteSwiftPackageReference "SimpleToast" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/sanzaru/SimpleToast";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 0.7.2;
+			};
+		};
+		D25D624D2A78800D00F89ED4 /* XCRemoteSwiftPackageReference "socket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/socketio/socket.io-client-swift";
+			requirement = {
+				branch = master;
+				kind = branch;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -517,6 +535,16 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 2545A2452A53F3A700E36D13 /* XCRemoteSwiftPackageReference "KeychainAccess" */;
 			productName = KeychainAccess;
+		};
+		D20D9A602A7E7466005327E3 /* SimpleToast */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D20D9A5F2A7E7466005327E3 /* XCRemoteSwiftPackageReference "SimpleToast" */;
+			productName = SimpleToast;
+		};
+		D25D624E2A78800D00F89ED4 /* SocketIO */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = D25D624D2A78800D00F89ED4 /* XCRemoteSwiftPackageReference "socket" */;
+			productName = SocketIO;
 		};
 /* End XCSwiftPackageProductDependency section */
 	};

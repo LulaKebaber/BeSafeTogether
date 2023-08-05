@@ -39,15 +39,15 @@ struct UserWords: Decodable {
 
 struct UserContact: Decodable, Identifiable {
     let id: String
+    let username: String
     let name: String
     let phone: String
-    let gps: Bool
     
     enum CodingKeys: String, CodingKey {
         case id = "_id"
+        case username
         case name
         case phone
-        case gps
     }
 } // get user contacts
 
@@ -57,4 +57,15 @@ struct UserContacts: Decodable {
 
 struct TranscribeResponse: Decodable {
     let text: String
+} // get transcription
+
+struct Threat: Decodable {
+    let username: String
+    let threat_recognised: Bool
+    let latitude: Float
+    let longitude: Float
+} // get threated users
+
+struct Threats: Decodable {
+    let threats: [Threat]
 }

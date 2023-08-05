@@ -12,11 +12,10 @@ import KeychainAccess
 
 struct ContactsView: View {
     @Environment(\.presentationMode) var mode: Binding<PresentationMode>
-    @StateObject  var contactsViewModel = ContactsViewModel() // Create the ContactsViewModel instance
+    @StateObject var contactsViewModel = ContactsViewModel() // Create the ContactsViewModel instance
     
     @State var isAddingContact = false
-    @State var firstName = ""
-    @State var lastName = ""
+    @State var username = ""
     @State var phoneNumber = ""
     @State var gps = false
     @State var isLoad = false
@@ -28,7 +27,7 @@ struct ContactsView: View {
             list
             Spacer()
             HStack {
-                Text("Your default message:") 
+                Text("Your default message:")
                     .font(Font(UIFont.regular_18))
                 Spacer()
                 Image(systemName: "info.circle")
@@ -38,10 +37,13 @@ struct ContactsView: View {
             .padding([.leading, .trailing], 30)
             MessageView()
                 .padding(.bottom, 25)
+            Button("dwdw") {
+                contactsViewModel.getContacts()
+            }
         }
         .navigationBarBackButtonHidden(true)
-        .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: {
-            contactsViewModel.addContact(firstName: firstName, lastName: lastName, phoneNumber: phoneNumber, gps: gps)
+        .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, username: $username, phoneNumber: $phoneNumber, gps: $gps, addContactAction: {
+            contactsViewModel.addContact(username: username)
         })
         )
         .onAppear {
@@ -51,7 +53,7 @@ struct ContactsView: View {
     
     var list: some View {
         List(contactsViewModel.contacts) { contact in
-            ContactView(contactName: contact.name, contactPhoneNumber: contact.phone, gps: contact.gps)
+            ContactView(contactUsername: contact.username, contactPhoneNumber: contact.phone, contactName: contact.name)
                 .swipeActions(edge: .trailing, allowsFullSwipe: true) {
                     HStack{
                         Button(action: {
@@ -65,13 +67,17 @@ struct ContactsView: View {
         }
         .listStyle(.plain)
         .background(.white)
+        .onAppear {
+            contactsViewModel.getContacts()
+        }
     }
+    
 }
 
 struct ContactView: View {
-    @State var contactName: String
+    @State var contactUsername: String
     @State var contactPhoneNumber: String
-    @State var gps: Bool
+    @State var contactName: String
     
     var body: some View {
         HStack {
@@ -85,23 +91,79 @@ struct ContactView: View {
             
             Spacer()
             
-            Button(action: {}) {
-                ZStack {
-                    RoundedRectangle(cornerRadius: 13)
-                        .foregroundColor(Color.black)
-                        .frame(width: 65, height: 35)
-                    Text("Edit")
-                        .foregroundColor(Color.white)
-                        .font(Font(UIFont.regular_14))
-                } // ZStack
-                .padding()
-            }
+            VStack(alignment: .leading) {
+                Text(contactUsername)
+                    .font(Font(UIFont.regular_16))
+            } // VStack
+            .padding()
         } // HStack
         .padding([.leading, .trailing], 17)
         .background(RoundedRectangle(cornerRadius: 10)
             .fill(Color.white)
             .frame(width: 330, height: 70)
             .shadow(color: Color.gray.opacity(0.5), radius: 3, x: 0, y: 2))
+    }
+}
+
+
+
+struct AddContactButtonView: View {
+    @Binding var isAddingContact: Bool
+    @Binding var username: String
+    @Binding var phoneNumber: String
+    @Binding var gps: Bool
+    var addContactAction: () -> Void // Closure without arguments
+    
+    var body: some View {
+        Button(action: {
+            isAddingContact = true
+        }) {
+            Image(systemName: "plus")
+                .imageScale(.large)
+                .foregroundColor(Color.black)
+        }
+        .sheet(isPresented: $isAddingContact) {
+            NewContactView(username: $username, phoneNumber: $phoneNumber, gps: $gps, addContactAction: addContactAction) // Pass the addContactAction closure to NewContactView
+        }
+    }
+}
+
+struct NewContactView: View {
+    @Environment(\.presentationMode) var presentationMode
+    @Binding var username: String
+    @Binding var phoneNumber: String
+    @Binding var gps: Bool
+    var addContactAction: () -> Void // New closure for addContact action
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Username")) {
+                    TextField("Username", text: $username)
+                }
+                
+                Section(header: Text("Phone")) {
+                    TextField("Phone Number", text: $phoneNumber)
+                        .keyboardType(.phonePad)
+                }
+                Section(header: Text("Receive location")) {
+                    Toggle(isOn: $gps) {
+                        Text("Receive Notifications")
+                    }
+                }
+            }
+            .navigationBarTitle("New Contact")
+            .navigationBarItems(
+                leading: Button("Cancel") {
+                    presentationMode.wrappedValue.dismiss()
+                },
+                trailing: Button("Save") {
+                    addContactAction() // Call the addContactAction closure
+                    presentationMode.wrappedValue.dismiss()
+                }
+                    .disabled(username.isEmpty || phoneNumber.isEmpty)
+            )
+        }
     }
 }
 
@@ -133,71 +195,6 @@ struct MessageView: View {
                     .font(Font(UIFont.medium_18))
             } // ZStack
             .padding()
-        }
-    }
-}
-
-struct AddContactButtonView: View {
-    @Binding var isAddingContact: Bool
-    @Binding var firstName: String
-    @Binding var lastName: String
-    @Binding var phoneNumber: String
-    @Binding var gps: Bool
-    var addContactAction: () -> Void // Closure without arguments
-    
-    var body: some View {
-        Button(action: {
-            isAddingContact = true
-        }) {
-            Image(systemName: "plus")
-                .imageScale(.large)
-                .foregroundColor(Color.black)
-        }
-        .sheet(isPresented: $isAddingContact) {
-            NewContactView(firstName: $firstName, lastName: $lastName, phoneNumber: $phoneNumber, gps: $gps, addContactAction: addContactAction) // Pass the addContactAction closure to NewContactView
-        }
-    }
-}
-
-
-
-struct NewContactView: View {
-    @Environment(\.presentationMode) var presentationMode
-    @Binding var firstName: String
-    @Binding var lastName: String
-    @Binding var phoneNumber: String
-    @Binding var gps: Bool
-    var addContactAction: () -> Void // New closure for addContact action
-    
-    var body: some View {
-        NavigationView {
-            Form {
-                Section(header: Text("Name")) {
-                    TextField("First Name", text: $firstName)
-                    TextField("Last Name", text: $lastName)
-                }
-                
-                Section(header: Text("Phone")) {
-                    TextField("Phone Number", text: $phoneNumber)
-                        .keyboardType(.phonePad)
-                }
-                Section(header: Text("Receive Notifications")) {
-                    Toggle(isOn: $gps) {
-                        Text("Receive Notifications")
-                    }
-                }
-            }
-            .navigationBarTitle("New Contact")
-            .navigationBarItems(
-                leading: Button("Cancel") {
-                    presentationMode.wrappedValue.dismiss()
-                },
-                trailing: Button("Save") {
-                    addContactAction() // Call the addContactAction closure
-                    presentationMode.wrappedValue.dismiss()
-                }
-                    .disabled(firstName.isEmpty || lastName.isEmpty || phoneNumber.isEmpty)
-            )
         }
     }
 }
