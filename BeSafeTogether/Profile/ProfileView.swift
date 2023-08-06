@@ -25,39 +25,47 @@ struct ProfileView: View {
                 ContactsButtonView()
                 Spacer()
             }
+            .onAppear {
+                profileViewModel.getUserInfo() // Call the method to fetch user information
+            }
         }
     }
 }
 
 struct ProfileInfoView: View {
+    @StateObject var profileViewModel = ProfileViewModel()
+    
     var body: some View {
-        ZStack {
-            Rectangle()
-                .fill(Color.black)
-                .frame(width: 360.0, height: 110)
-                .cornerRadius(20)
-                .padding(10)
-            HStack {
-                ZStack{
-                    Image(systemName: "person.crop.circle.fill")
+            ZStack {
+                Rectangle()
+                    .fill(Color.black)
+                    .frame(width: 360.0, height: 110)
+                    .cornerRadius(20)
+                    .padding(10)
+                HStack {
+                    ZStack {
+                        Image(systemName: "person.crop.circle.fill")
+                            .resizable()
+                            .frame(width: 70, height: 70)
+                            .foregroundColor(Color.white)
+                    }
+                    Text(profileViewModel.username)
+                        .font(Font(UIFont.medium_22))
+                        .foregroundColor(Color.white)
+                        .padding(.leading, 5)
+                    Spacer()
+                    Image(systemName: "gearshape.fill")
                         .resizable()
-                        .frame(width: 70, height: 70)
+                        .frame(width: 30.0, height: 30)
                         .foregroundColor(Color.white)
                 }
-                Text("Username")
-                    .font(Font(UIFont.medium_22))
-                    .foregroundColor(Color.white)
-                    .padding(.leading, 5)
-                Spacer()
-                Image(systemName: "gearshape.fill")
-                    .resizable()
-                    .frame(width: 30.0, height: 30)
-                    .foregroundColor(Color.white)
+                .padding(.leading, 36)
+                .padding(.trailing, 45)
             }
-            .padding(.leading, 36)
-            .padding(.trailing, 45)
+            .onAppear {
+                profileViewModel.getUserInfo() // Call the method to fetch user information
+            }
         }
-    }
 }
 
 struct StopWordsView: View {

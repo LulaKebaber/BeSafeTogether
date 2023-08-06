@@ -37,11 +37,7 @@ struct ContactsView: View {
             .padding([.leading, .trailing], 30)
             MessageView()
                 .padding(.bottom, 25)
-            Button("dwdw") {
-                contactsViewModel.getContacts()
-            }
         }
-        .navigationBarBackButtonHidden(true)
         .navigationBarItems(trailing: AddContactButtonView(isAddingContact: $isAddingContact, username: $username, phoneNumber: $phoneNumber, gps: $gps, addContactAction: {
             contactsViewModel.addContact(username: username)
         })

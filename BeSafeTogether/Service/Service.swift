@@ -13,6 +13,7 @@ enum Service {
     case loginUser(username: String, password: String)
     case addWord(word: String)
     case getWords
+    case getUserInfo
     case addContact(username: String)
     case getContacts
     case transcribe(audioFile: URL, model: String)
@@ -36,6 +37,8 @@ extension Service: TargetType {
             return "/auth/users/tokens"
         case .addWord, .getWords:
             return "/auth/users/words"
+        case .getUserInfo:
+            return "/auth/users/me"
         case .addContact, .getContacts:
             return "/auth/users/contacts"
         case .transcribe:
@@ -53,7 +56,7 @@ extension Service: TargetType {
         switch self {
         case .registerNewUser, .loginUser, .addWord, .addContact, .transcribe:
             return .post
-        case .getWords, .getContacts, .checkForThreat:
+        case .getWords, .getContacts, .checkForThreat, .getUserInfo:
             return .get
         case .deleteContact, .deleteWord:
             return .delete
@@ -96,7 +99,7 @@ extension Service: TargetType {
         case .transcribe(let file, _):
             let multiPartData = MultipartFormData(provider: .file(file), name: "file")
             return .uploadMultipart([multiPartData])
-        case .getContacts, .getWords, .deleteContact, .deleteWord, .checkForThreat:
+        case .getContacts, .getWords, .getUserInfo, .deleteContact, .deleteWord, .checkForThreat:
             return .requestPlain
         case let .updateLocation(latitude, longitude):
             let parameters: [String: Any] = [
@@ -109,7 +112,7 @@ extension Service: TargetType {
     
     var headers: [String : String]? {
         switch self {
-        case .registerNewUser, .addWord, .addContact, .getContacts, .getWords, .deleteContact, .deleteWord, .checkForThreat, .updateLocation:
+        case .registerNewUser, .addWord, .addContact, .getContacts, .getWords, .getUserInfo, .deleteContact, .deleteWord, .checkForThreat, .updateLocation:
             return [
                 "accept": "application/json",
                 "Content-Type": "application/json"

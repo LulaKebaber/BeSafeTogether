@@ -10,6 +10,7 @@ import Foundation
 class ProfileViewModel: ObservableObject {
     private let apiManager = APIManager.shared
     
+    @Published var username: String = ""
     @Published var words = [UserWord]()
     
     func addWord(word: String) {
@@ -29,6 +30,19 @@ class ProfileViewModel: ObservableObject {
     func deleteWord(wordId: String) {
         apiManager.deleteWord(wordId: wordId) { [weak self] in
             self?.getWords()
+        }
+    }
+    
+    func getUserInfo() {
+        apiManager.getUserInfo { result in
+            switch result {
+            case let .success(userData):
+                DispatchQueue.main.async {
+                    self.username = userData.username
+                }
+            case let .failure(error):
+                print("Error fetching user info: \(error.localizedDescription)")
+            }
         }
     }
 }

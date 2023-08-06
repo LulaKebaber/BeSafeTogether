@@ -16,10 +16,11 @@ struct UserToken: Decodable {
     let token_type: String
 } // login
 
-//struct UserData: Decodable {
-//    let _id: String
-//    let email: String
-//} // get user data
+struct UserData: Decodable {
+    let _id: String
+    let username: String
+    let phone: String
+} // get user data
 
 struct UserWord: Decodable, Identifiable {
     let id: String

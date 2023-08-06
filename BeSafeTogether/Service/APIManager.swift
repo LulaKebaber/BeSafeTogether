@@ -86,23 +86,24 @@ struct APIManager {
     }
     
     
-    //    func getUserInfo() {
-    //
-    //        let provider = self.bearerProvider
-    //        
-    //        provider.request(.getUserInfo) { result in
-    //            switch result {
-    //            case let .success(response):
-    //                do {
-    //                    let users = try response.map(UserData.self)
-    //                } catch {
-    //                    print("Failed to parse users: \(error)")
-    //                }
-    //            case let .failure(error):
-    //                print("API request failed: \(error)")
-    //            }
-    //        }
-    //    }
+    func getUserInfo(completion: @escaping (Result<UserData, Error>) -> Void) {
+        let provider = self.bearerProvider
+        
+        provider.request(.getUserInfo) { result in
+            switch result {
+            case let .success(response):
+                do {
+                    let userInfo = try response.map(UserData.self)
+                    completion(.success(userInfo))
+                } catch {
+                    completion(.failure(error))
+                }
+            case let .failure(error):
+                completion(.failure(error))
+            }
+        }
+    }
+
     
     func addWord(word: String, completion: @escaping () -> Void) {
         let provider = self.bearerProvider
